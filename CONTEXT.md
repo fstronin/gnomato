@@ -20,6 +20,10 @@ _Avoid_: session, phase, period
 N Pomodoro подряд, после которых идёт Long Break. N по умолчанию 4.
 _Avoid_: cycle, round, series, «комплект»
 
+**Slot**:
+Место Pomodoro внутри Set. Skip расходует слот так же, как завершение, поэтому Set не растягивается.
+_Avoid_: step, index, «шаг», «позиция в комплекте»
+
 **Timer**:
 Автомат, который ведёт ровно один Interval за раз и переводит счёт от одного Interval к следующему.
 _Avoid_: session, engine, scheduler
