@@ -9,7 +9,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {Kind, State, Timer} from './lib/timer.js';
-import {shouldAutoStart} from './lib/schedule.js';
+import {shouldAutoStart, isBreak} from './lib/schedule.js';
 import {fromSettingsValues, toSettingsValues} from './lib/state.js';
 import {GnomatoIndicator} from './ui/indicator.js';
 
@@ -175,9 +175,51 @@ export default class GnomatoExtension extends Extension {
             return;
         }
 
+        this._announce(event);
         if (this._shouldAutoStart())
             this._timer.start();
         this._afterTransition();
+    }
+
+    /**
+     * One banner per finished interval, plus the theme sound. A restored
+     * completion happened while the timer was not running, so it says so.
+     * A skipped or reset interval gets neither: it was not a transition the
+     * user could miss.
+     */
+    _announce(event) {
+        const isBreakKind = isBreak(event.record.kind);
+        let title;
+        let body;
+
+        if (event.restored) {
+            title = isBreakKind
+                ? _('Break ended while you were away')
+                : _('Pomodoro finished while you were away');
+            body = isBreakKind
+                ? _('Ready for the next pomodoro.')
+                : _('The journal has been updated.');
+        } else {
+            title = isBreakKind ? _('Break over') : _('Pomodoro finished');
+            body = isBreakKind ? _('Back to work.') : _('Time for a break.');
+        }
+
+        Main.notify(title, body);
+        this._playSound();
+    }
+
+    /** The sound comes from the theme, gated by both our switch and the system one. */
+    _playSound() {
+        if (!this._settings.get_boolean('sound-enabled'))
+            return;
+        if (!this._soundSettings.get_boolean('event-sounds'))
+            return;
+
+        try {
+            global.display.get_sound_player().play_from_theme('complete', _('Pomodoro timer'), null);
+        } catch (e) {
+            console.error(`gnomato: cannot play the sound: ${e.message}`);
+        }
     }
 
     _shouldAutoStart() {
