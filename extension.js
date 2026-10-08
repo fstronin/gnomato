@@ -79,7 +79,9 @@ export default class GnomatoExtension extends Extension {
         this._indicator?.destroy();
         this._indicator = null;
 
-        this._settings.sync();
+        // `g_settings_sync()` is a function of Gio.Settings, not a method of the
+        // settings object: flushing the pending writes is a global operation.
+        Gio.Settings.sync();
         this._settings = null;
         this._soundSettings = null;
         this._timer = null;
@@ -160,18 +162,14 @@ export default class GnomatoExtension extends Extension {
     }
 
     _syncUI() {
-        this._indicator.setPaused(this._timer.state === State.PAUSED);
-        this._indicator.setRemaining(this._timer.state === State.IDLE ? null : this._timer.remainingMs);
-        this._indicator.setIntervalActionsEnabled(this._timer.state !== State.IDLE);
-        this._indicator.setToggleLabel(this._toggleLabel());
-    }
-
-    _toggleLabel() {
-        if (this._timer.state === State.RUNNING)
-            return _('Pause');
-        if (this._timer.state === State.PAUSED)
-            return _('Resume');
-        return _('Start');
+        this._indicator.setInterval({
+            state: this._timer.state,
+            kind: this._timer.kind,
+            remainingMs: this._timer.remainingMs,
+            plannedMs: this._timer.plannedMs,
+            slot: this._timer.slot,
+            setSize: this._timer.setSize,
+        });
     }
 
     /** A second-by-second source exists only while an interval is running. */

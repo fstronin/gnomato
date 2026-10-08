@@ -200,6 +200,67 @@ export const tests = defineTests(test => {
         equal(revived.skip().actualMs, 60000);
     });
 
+    test('the set size is public and follows the last command', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock, {setSize: 3});
+        equal(t.setSize, 3);
+        t.setSetSize(5);
+        equal(t.setSize, 5);
+    });
+
+    test('a set size chosen mid-set is the next set of the row', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock, {setSize: 2});
+
+        t.start();
+        clock.advance(1500000);
+        t.tick();
+        equal(t.slot, 1);
+
+        t.setSetSize(5);
+        equal(t.setSize, 2, 'the running set keeps the size it started with');
+
+        t.start();
+        clock.advance(300000);
+        t.tick();
+        equal(t.kind, Kind.POMODORO);
+        equal(t.setSize, 2);
+
+        t.start();
+        clock.advance(1500000);
+        t.tick();
+        equal(t.kind, Kind.LONG_BREAK, 'the set ends after its own two pomodoros');
+        equal(t.slot, 2);
+
+        t.start();
+        clock.advance(900000);
+        t.tick();
+        equal(t.kind, Kind.POMODORO);
+        equal(t.slot, 0);
+        equal(t.setSize, 5, 'the next set is the size chosen mid-set');
+    });
+
+    test('the plan of the next interval is the plan while idle', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock);
+        equal(t.plannedMs, 1500000);
+        t.start();
+        clock.advance(1500000);
+        t.tick();
+        equal(t.plannedMs, 300000);
+    });
+
+    test('an open interval keeps its own plan when durations change', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock);
+        t.start();
+        clock.advance(600000);
+        t.setDurations({...DUR, POMODORO: 3000000});
+        equal(t.plannedMs, 1500000);
+        t.reset();
+        equal(t.plannedMs, 3000000);
+    });
+
     test('pause time before a resume is not counted as work after a reload', () => {
         const clock = fakeClock();
         const t = newTimer(clock);

@@ -1,0 +1,124 @@
+/* Gnomato popup. Loaded by the shell itself on enable(), so a change of look
+   takes a disable/enable of the extension — not a new shell session. Only the
+   JavaScript needs a new session.
+
+   Colors come from the theme: the system accent for a pomodoro, and a neutral
+   mixed from the accent for a break — a fixed green would be indistinguishable
+   from the accent when the accent itself is green. */
+
+/* Break: neutral and dimmed. The mix is written out wherever the neutral is
+   needed — St stylesheets have no variables to hold it — and stays off the
+   accent's hue, so that a green accent still tells a break from a pomodoro. */
+.gnomato-popup--break .gnomato-ring-area {
+  color: st-mix(-st-accent-color, #a8a8ac, 70%);
+  -gnomato-ring-track-color: st-transparentize(st-mix(-st-accent-color, #a8a8ac, 70%), 0.78);
+  opacity: 0.9;
+}
+
+.gnomato-popup-content {
+  min-width: 280px;
+  padding: 14px 18px 8px;
+}
+
+.gnomato-ring-area {
+  min-width: 180px;
+  min-height: 180px;
+  -gnomato-ring-width: 8px;
+  color: -st-accent-color;
+  -gnomato-ring-track-color: st-transparentize(-st-accent-color, 0.82);
+}
+
+/* Idle: the accent in half light, and the plan of the next interval. Later than
+   the kind rule so that it also dims a pending break. */
+.gnomato-popup--idle .gnomato-ring-area {
+  color: -st-accent-color;
+  -gnomato-ring-track-color: st-transparentize(-st-accent-color, 0.86);
+  opacity: 0.45;
+}
+
+.gnomato-time {
+  font-size: 30pt;
+  font-weight: 300;
+}
+
+.gnomato-kind {
+  font-size: 9pt;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.gnomato-pause-icon {
+  icon-size: 14px;
+  margin: 3px 0;
+  opacity: 0.9;
+}
+
+.gnomato-tomatoes {
+  spacing: 8px;
+  margin-top: 16px;
+}
+
+.gnomato-tomato {
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px st-mix(-st-accent-color, #a8a8ac, 70%);
+}
+
+.gnomato-tomato--filled {
+  background-color: st-mix(-st-accent-color, #a8a8ac, 70%);
+  box-shadow: none;
+}
+
+.gnomato-tomato--current {
+  box-shadow: inset 0 0 0 2px -st-accent-color;
+}
+
+.gnomato-tomato--filled.gnomato-tomato--current {
+  background-color: -st-accent-color;
+}
+
+.gnomato-tomatoes-label {
+  font-size: 11pt;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.gnomato-controls {
+  spacing: 18px;
+  margin-top: 14px;
+}
+
+.gnomato-button:hover {
+  background-color: st-transparentize(-st-accent-color, 0.55);
+}
+
+.gnomato-button:active {
+  background-color: st-transparentize(-st-accent-color, 0.3);
+}
+
+.gnomato-button--inactive {
+  opacity: 0.35;
+}
+
+.gnomato-button--primary {
+  color: -st-accent-fg-color;
+  background-color: -st-accent-color;
+}
+
+.gnomato-button--primary:hover {
+  background-color: st-lighten(-st-accent-color, 5%);
+}
+
+.gnomato-button--primary:active {
+  background-color: st-darken(-st-accent-color, 7%);
+}
+
+.gnomato-tooltip {
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 9pt;
+  -y-offset: 8px;
+}

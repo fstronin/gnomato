@@ -43,7 +43,7 @@
     <key name="toggle-keybinding" type="as">
       <default>[]</default>
       <summary>Start or pause the timer</summary>
-      <description>Global shortcut that starts, pauses or resumes the timer. Empty by default; the timer is driven from its panel menu until keys are assigned here.</description>
+      <description>Global shortcut that starts, pauses or resumes the timer. Empty by default; the timer is driven from its panel popup until keys are assigned here.</description>
     </key>
     <key name="skip-keybinding" type="as">
       <default>[]</default>

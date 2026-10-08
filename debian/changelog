@@ -1,3 +1,12 @@
+gnomato (0.2.0) unstable; urgency=medium
+
+  * Panel popup: a countdown ring, the interval in words, the set as a row of
+    tomatoes, and start/pause, skip and reset as round buttons. The popup opens
+    on a left click, the menu with the day's count and the preferences moves to
+    the right click. Styles live in stylesheet.css and ship with the package.
+
+ -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Thu, 08 Oct 2026 23:40:00 +0000
+
 gnomato (0.1.0) unstable; urgency=medium
 
   * Initial release: panel countdown, configurable pomodoro and break lengths,

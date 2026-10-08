@@ -7,7 +7,8 @@ journal of what actually happened.
 | | |
 |---|---|
 | Panel | Countdown while an interval runs, a pause mark while it is paused, the icon alone when idle |
-| Menu | Start/Pause/Resume, Skip, Reset, today's finished pomodoros, Preferences |
+| Popup | Left click: a countdown ring, the interval in words, the set as a row of tomatoes, and start/pause, skip and reset as round buttons |
+| Menu | Right click: today's finished pomodoros and Preferences |
 | Intervals | Configurable pomodoro and break lengths, a set of N pomodoros ending in a long break |
 | Behaviour | Breaks start themselves, pomodoros do not; a sound and a banner when an interval ends |
 | Journal | Append-only JSONL of finished, skipped and interrupted intervals |
@@ -60,7 +61,7 @@ somewhere else.
 ## Development
 
 The extension directory *is* the repository root: `metadata.json`,
-`extension.js`, `prefs.js`, `lib/`, `ui/`, `schemas/`.
+`extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `schemas/`.
 
 ```sh
 glib-compile-schemas schemas/            # after editing the schema
@@ -75,21 +76,23 @@ extension: a plain `--delete` protects excluded paths from deletion.
 ```sh
 rsync -a --delete --delete-excluded \
       --exclude .git --exclude .gitignore --exclude .superpowers \
-      --exclude docs --exclude tests --exclude CONTEXT.md \
-      --exclude debian --exclude dist --exclude '*.deb' \
+      --exclude docs --exclude tests --exclude CONTEXT.md --exclude AGENTS.md \
+      --exclude debian --exclude dist --exclude '*.deb' --exclude .scratch \
       --exclude README.md --exclude build-deb.sh \
       ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin/
 gnome-extensions enable gnomato@fstronin
 ```
 
 What lands there is the extension payload and `LICENSE`: `metadata.json`,
-`extension.js`, `prefs.js`, `lib/`, `ui/`, `schemas/`, `LICENSE`.
+`extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `schemas/`,
+`LICENSE`.
 
 Then, in order of how much they change:
 
 - `gnome-extensions disable gnomato@fstronin && gnome-extensions enable gnomato@fstronin`
-  re-runs `enable()`/`disable()`, which is enough for anything except edits to
-  the modules themselves.
+  re-runs `enable()`/`disable()`. That is enough for `stylesheet.css` — the shell
+  reloads it on every enable, so the look of the popup can be iterated without a
+  new session — and for anything else except the modules themselves.
 - Editing `extension.js`, `lib/` or `ui/` needs a new shell process: on Wayland
   that means logging out and back in. The ESM module cache cannot be flushed and
   `gnome-extensions` has no reload command.

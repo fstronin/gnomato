@@ -18,7 +18,7 @@ binary-indep: binary-arch
 
 binary-arch: build
 	install -d $(EXTDIR)/lib $(EXTDIR)/ui $(EXTDIR)/schemas $(DOCDIR) $(STAGE)/DEBIAN
-	install -m 0644 metadata.json extension.js prefs.js LICENSE $(EXTDIR)/
+	install -m 0644 metadata.json extension.js prefs.js LICENSE stylesheet.css $(EXTDIR)/
 	install -m 0644 lib/*.js $(EXTDIR)/lib/
 	install -m 0644 ui/*.js $(EXTDIR)/ui/
 	install -m 0644 schemas/*.gschema.xml $(EXTDIR)/schemas/

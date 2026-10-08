@@ -8,6 +8,7 @@ import {tests as timerTests} from './timer.test.js';
 import {tests as journalTests} from './journal.test.js';
 import {tests as journalfileTests} from './journalfile.test.js';
 import {tests as stateTests} from './state.test.js';
+import {tests as progressTests} from './progress.test.js';
 
 const suites = [
     ['format', formatTests],
@@ -16,6 +17,7 @@ const suites = [
     ['journal', journalTests],
     ['journalfile', journalfileTests],
     ['state', stateTests],
+    ['progress', progressTests],
 ];
 
 let passed = 0;
