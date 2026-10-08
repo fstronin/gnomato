@@ -176,4 +176,41 @@ export const tests = defineTests(test => {
         equal(revived.remainingMs, t.remainingMs);
         equal(revived.startedWallMs, t.startedWallMs);
     });
+
+    test('a completion observed late is recorded at its deadline', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock);
+        t.start();
+        clock.advance(3 * 24 * 3600 * 1000);   // three days before anyone looked again
+        const revived = newTimer(clock);
+        revived.restore(t.toPersisted());
+        const event = revived.tick();
+        equal(event.record.endedWallMs, event.record.startedWallMs + 1500000);
+    });
+
+    test('pause time before a reload is not counted as work', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock);
+        t.start();
+        clock.advance(60000);
+        t.pause();
+        clock.advance(1800000);
+        const revived = newTimer(clock);
+        revived.restore(t.toPersisted());
+        equal(revived.skip().actualMs, 60000);
+    });
+
+    test('pause time before a resume is not counted as work after a reload', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock);
+        t.start();
+        clock.advance(60000);
+        t.pause();
+        clock.advance(600000);
+        t.resume();
+        clock.advance(60000);
+        const revived = newTimer(clock);   // reload while the interval runs
+        revived.restore(t.toPersisted());
+        equal(revived.skip().actualMs, 120000);
+    });
 });
