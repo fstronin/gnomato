@@ -16,10 +16,20 @@ export function equal(actual, expected, msg = '') {
 }
 
 export function deepEqual(actual, expected, msg = '') {
-    const got = JSON.stringify(actual);
-    const want = JSON.stringify(expected);
+    const got = canonical(actual);
+    const want = canonical(expected);
     if (got !== want)
         fail(`${msg} expected ${want}, got ${got}`.trim());
+}
+
+function canonical(value) {
+    if (Array.isArray(value))
+        return `[${value.map(canonical).join(',')}]`;
+    if (value !== null && typeof value === 'object') {
+        const keys = Object.keys(value).sort();
+        return `{${keys.map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
+    }
+    return JSON.stringify(value);
 }
 
 export function ok(value, msg = '') {
