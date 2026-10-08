@@ -59,4 +59,19 @@ export const tests = defineTests(test => {
     test('an unwritable path reports failure instead of throwing', () => {
         equal(appendRecords('/proc/gnomato/journal.jsonl', [rec()]), false);
     });
+
+    test('a partial line without a newline does not swallow the next record', () => {
+        const path = tmpPath();
+        const file = Gio.File.new_for_path(path);
+        GLib.mkdir_with_parents(GLib.path_get_dirname(path), 0o755);
+        const out = file.append_to(Gio.FileCreateFlags.NONE, null);
+        out.write_all(new TextEncoder().encode('{"v":1,"started_ms":1}\n{"v":1,"par'), null);
+        out.close(null);
+
+        ok(appendRecords(path, [rec({started_ms: 7})]));
+        const {records, skipped} = readRecords(path);
+        equal(records.length, 2);
+        equal(records[1].started_ms, 7);
+        equal(skipped, 1);
+    });
 });
