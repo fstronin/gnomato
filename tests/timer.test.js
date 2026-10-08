@@ -240,6 +240,51 @@ export const tests = defineTests(test => {
         equal(t.setSize, 5, 'the next set is the size chosen mid-set');
     });
 
+    test('a size edited while the first pomodoro of a set runs is for the next set', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock, {setSize: 4});
+        const consume = ms => {
+            t.start();
+            clock.advance(ms);
+            t.tick();
+        };
+
+        t.start();
+        t.setSetSize(6);
+        equal(t.setSize, 4, 'the running set keeps the size it started with');
+
+        clock.advance(1500000);
+        t.tick();
+        equal(t.slot, 1);
+        // walk the set out: one break and one pomodoro per remaining slot
+        for (let slot = 1; slot < 4; slot++) {
+            consume(300000);
+            consume(1500000);
+        }
+        equal(t.kind, Kind.LONG_BREAK, 'the set still ends after its own four pomodoros');
+        equal(t.slot, 4);
+
+        consume(900000);
+        equal(t.kind, Kind.POMODORO);
+        equal(t.setSize, 6, 'the next set is the size edited during the first one');
+    });
+
+    test('a size edited while the first pomodoro is paused is for the next set', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock, {setSize: 4});
+        t.start();
+        t.pause();
+        t.setSetSize(6);
+        equal(t.setSize, 4);
+    });
+
+    test('a size edited before the set has started applies at once', () => {
+        const clock = fakeClock();
+        const t = newTimer(clock, {setSize: 4});
+        t.setSetSize(6);
+        equal(t.setSize, 6, 'nothing has been consumed and no interval is open');
+    });
+
     test('the plan of the next interval is the plan while idle', () => {
         const clock = fakeClock();
         const t = newTimer(clock);
