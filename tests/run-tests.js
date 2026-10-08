@@ -4,10 +4,12 @@ import system from 'system';
 
 import {tests as formatTests} from './format.test.js';
 import {tests as scheduleTests} from './schedule.test.js';
+import {tests as timerTests} from './timer.test.js';
 
 const suites = [
     ['format', formatTests],
     ['schedule', scheduleTests],
+    ['timer', timerTests],
 ];
 
 let passed = 0;
