@@ -67,11 +67,15 @@ glib-compile-schemas schemas/            # after editing the schema
 gjs -m tests/run-tests.js                # unit tests for lib/, no shell needed
 ```
 
-Install the working tree for the current user:
+Install the working tree for the current user — only the extension itself
+belongs in the shell's extension directory:
 
 ```sh
-rsync -a --delete --exclude .git --exclude .superpowers --exclude docs \
-      --exclude tests ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin/
+rsync -a --delete \
+      --exclude .git --exclude .superpowers --exclude docs --exclude tests \
+      --exclude debian --exclude dist --exclude '*.deb' \
+      --exclude README.md --exclude build-deb.sh \
+      ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin/
 gnome-extensions enable gnomato@fstronin
 ```
 
