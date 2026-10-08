@@ -11,6 +11,8 @@ import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/ex
 import {Kind, State, Timer} from './lib/timer.js';
 import {shouldAutoStart, isBreak} from './lib/schedule.js';
 import {fromSettingsValues, toSettingsValues} from './lib/state.js';
+import {dayKey, makeRecords, todayCount} from './lib/journal.js';
+import {appendRecords, journalPath, readRecords} from './lib/journalfile.js';
 import {GnomatoIndicator} from './ui/indicator.js';
 
 const INTERVAL_KEYS = ['pomodoro-seconds', 'short-break-seconds', 'long-break-seconds'];
@@ -53,6 +55,7 @@ export default class GnomatoExtension extends Extension {
 
         this._syncUI();
         this._syncTickSource();
+        this._refreshTodayCount();
 
         // Catches up with an interval whose deadline passed while the extension
         // was not running: this is what a shell restart, a screen lock and a
@@ -122,13 +125,31 @@ export default class GnomatoExtension extends Extension {
     }
 
     _skip() {
-        this._timer.skip();
+        this._writeRecords(this._timer.skip());
         this._afterTransition();
     }
 
     _reset() {
-        this._timer.reset();
+        this._writeRecords(this._timer.reset());
         this._afterTransition();
+    }
+
+    /**
+     * The journal is history, not the timer's memory: a failed write is logged
+     * and the countdown carries on.
+     */
+    _writeRecords(closed) {
+        if (!closed)
+            return;
+        if (!appendRecords(journalPath(), makeRecords(closed)))
+            return;
+        this._refreshTodayCount();
+    }
+
+    _refreshTodayCount() {
+        const {records} = readRecords(journalPath());
+        const today = dayKey(Math.floor(GLib.get_real_time() / 1000));
+        this._indicator.setTodayCount(todayCount(records, today));
     }
 
     /** Persisting, retiming the tick source and repainting, in that order. */
@@ -176,6 +197,7 @@ export default class GnomatoExtension extends Extension {
         }
 
         this._announce(event);
+        this._writeRecords(event.record);
         if (this._shouldAutoStart())
             this._timer.start();
         this._afterTransition();
