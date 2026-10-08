@@ -4,6 +4,7 @@
   "description": "Pomodoro timer: counts down one interval at a time in the panel and keeps a journal of finished focus and break intervals.",
   "shell-version": ["50"],
   "version": 1,
+  "url": "https://github.com/fstronin/gnomato",
   "settings-schema": "org.gnome.shell.extensions.gnomato",
   "gettext-domain": "gnomato@fstronin"
 }

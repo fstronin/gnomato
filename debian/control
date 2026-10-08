@@ -3,6 +3,7 @@ Section: gnome
 Priority: optional
 Maintainer: Yegor Chuperka <yegor-chuperka@yandex.ru>
 Standards-Version: 4.6.2
+Homepage: https://github.com/fstronin/gnomato
 Rules-Requires-Root: no
 
 Package: gnomato
