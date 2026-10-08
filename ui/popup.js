@@ -296,7 +296,7 @@ export class GnomatoPopup extends PopupMenu.PopupMenu {
     setInterval({state, kind, remainingMs, plannedMs, slot, setSize}) {
         this._plannedMs = plannedMs;
 
-        this._applyStateClasses(kind, state);
+        this._applyIntervalClasses(kind, state);
         this._timeLabel.text = formatRemaining(remainingMs);
         this._kindLabel.text = kindLabel(kind);
         this._pauseIcon.visible = state === State.PAUSED;
@@ -347,7 +347,7 @@ export class GnomatoPopup extends PopupMenu.PopupMenu {
         return _('Start');
     }
 
-    _applyStateClasses(kind, state) {
+    _applyIntervalClasses(kind, state) {
         for (const className of POPUP_CLASSES)
             this.box.remove_style_class_name(className);
         this.box.add_style_class_name(KIND_CLASSES[kind]);

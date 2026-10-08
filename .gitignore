@@ -1,3 +1,5 @@
 *.deb
 *.zip
 .superpowers/
+
+.scratch/
