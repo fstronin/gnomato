@@ -59,23 +59,22 @@
 }
 
 .gnomato-tomato {
-  min-width: 12px;
-  min-height: 12px;
+  min-width: 8px;
+  min-height: 8px;
+  /* The ring of an empty slot is a border, not an inset box-shadow: St only
+     paints an inset shadow when the node also has a border or a background
+     colour, so a shadow-only dot comes out invisible. */
+  border: 2px solid st-mix(-st-accent-color, #a8a8ac, 70%);
   border-radius: 999px;
-  box-shadow: inset 0 0 0 2px st-mix(-st-accent-color, #a8a8ac, 70%);
 }
 
 .gnomato-tomato--filled {
   background-color: st-mix(-st-accent-color, #a8a8ac, 70%);
-  box-shadow: none;
+  border-color: st-mix(-st-accent-color, #a8a8ac, 70%);
 }
 
 .gnomato-tomato--current {
-  box-shadow: inset 0 0 0 2px -st-accent-color;
-}
-
-.gnomato-tomato--filled.gnomato-tomato--current {
-  background-color: -st-accent-color;
+  border-color: -st-accent-color;
 }
 
 .gnomato-tomatoes-label {

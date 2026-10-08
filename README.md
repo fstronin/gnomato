@@ -28,7 +28,7 @@ marked `restored` in the journal. See `docs/adr/0001-wall-clock-interval-semanti
 
 ```sh
 ./build-deb.sh
-sudo dpkg -i dist/gnomato_0.1.0_all.deb
+sudo dpkg -i dist/gnomato_0.2.0_all.deb
 gnome-extensions enable gnomato@fstronin
 ```
 

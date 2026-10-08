@@ -47,10 +47,14 @@ export default class GnomatoExtension extends Extension {
         for (const key of INTERVAL_KEYS) {
             this._signalIds.push(this._settings.connect(`changed::${key}`, () => {
                 this._timer.setDurations(this._durations());
+                // A length changed while the popup sits open in Idle: it shows
+                // the plan of the next interval, so it has to be redrawn.
+                this._syncUI();
             }));
         }
         this._signalIds.push(this._settings.connect('changed::set-size', () => {
             this._timer.setSetSize(this._settings.get_int('set-size'));
+            this._syncUI();
         }));
 
         this._syncUI();

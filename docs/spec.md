@@ -12,6 +12,7 @@
 | ОС/сессия | Ubuntu 26.04.1 LTS, Wayland, тема иконок `Yaru-dark` |
 | Расширения | только ESM; `extension.js` обязан экспортировать default-класс, имя каталога обязано совпадать с `uuid`, каждый каталог расширения изолирован (`session-modes` по умолчанию `["user"]`) |
 | Модули shell | `resource:///org/gnome/shell/ui/main.js`, `ui/panelMenu.js` (`Button`), `ui/popupMenu.js` (`PopupMenuItem`, `PopupSeparatorMenuItem`), `ui/messageTray.js`, `ui/quickSettings.js`, `extensions/extension.js` (`Extension`, `gettext`) |
+| `St` CSS | `inset box-shadow` рисуется только у узла, у которого есть рамка или фон с ненулевой альфой (`st_theme_node_paint`, условие `has_inset_box_shadow && (has_border \|\| background_color.alpha > 0)`), поэтому контур пустого слота — рамка, а не тень; `min-width`/`min-height` из CSS задают размер и обычному `St.Widget` |
 | Иконки | `alarm-symbolic` и `media-playback-pause-symbolic` есть и в Adwaita, и в Yaru |
 | Звук | `global.display.get_sound_player()` с `play_from_theme` — тот же путь, что использует сам shell; `GSound-1.0.typelib` **отсутствует**; `Gst-1.0`/`GstPlay-1.0` есть, но не нужны; `/usr/share/sounds/freedesktop/stereo/complete.oga` существует |
 | Настройки | `org.gnome.desktop.sound` (`event-sounds`, `theme-name`); `org.gnome.desktop.notifications` (`show-banners`, `show-in-lock-screen`) |

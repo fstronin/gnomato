@@ -121,7 +121,6 @@ class GnomatoTooltip extends St.Label {
     _init() {
         super._init({
             style_class: 'gnomato-tooltip',
-            opacity: 0,
             visible: false,
         });
         this._timeoutId = 0;
