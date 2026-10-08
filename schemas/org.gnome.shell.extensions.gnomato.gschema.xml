@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.gnomato" path="/org/gnome/shell/extensions/gnomato/">
+    <key name="pomodoro-seconds" type="i">
+      <default>1500</default>
+      <range min="60" max="10800"/>
+      <summary>Pomodoro length</summary>
+      <description>Length of one work interval in seconds. The preferences window edits this in whole minutes, from 1 to 180.</description>
+    </key>
+    <key name="short-break-seconds" type="i">
+      <default>300</default>
+      <range min="60" max="10800"/>
+      <summary>Short break length</summary>
+      <description>Length of the break that follows a pomodoro, in seconds.</description>
+    </key>
+    <key name="long-break-seconds" type="i">
+      <default>900</default>
+      <range min="60" max="10800"/>
+      <summary>Long break length</summary>
+      <description>Length of the break that ends a set, in seconds.</description>
+    </key>
+    <key name="set-size" type="i">
+      <default>4</default>
+      <range min="1" max="12"/>
+      <summary>Pomodoros per set</summary>
+      <description>How many pomodoros are followed by a long break instead of a short one.</description>
+    </key>
+    <key name="auto-start-breaks" type="b">
+      <default>true</default>
+      <summary>Start breaks automatically</summary>
+      <description>Begin the next break as soon as the pomodoro is over.</description>
+    </key>
+    <key name="auto-start-work" type="b">
+      <default>false</default>
+      <summary>Start pomodoros automatically</summary>
+      <description>Begin the next pomodoro as soon as the break is over. Off by default: coming back to work should be a deliberate act.</description>
+    </key>
+    <key name="sound-enabled" type="b">
+      <default>true</default>
+      <summary>Sound at the end of an interval</summary>
+      <description>Play the theme sound when an interval finishes. The system event sound setting is respected as well.</description>
+    </key>
+    <key name="toggle-keybinding" type="as">
+      <default>[]</default>
+      <summary>Start or pause the timer</summary>
+      <description>Global shortcut that starts, pauses or resumes the timer. Empty by default; the timer is driven from its panel menu until keys are assigned here.</description>
+    </key>
+    <key name="skip-keybinding" type="as">
+      <default>[]</default>
+      <summary>Skip the current interval</summary>
+      <description>Global shortcut that finishes the current interval early. Empty by default.</description>
+    </key>
+    <key name="timer-state" type="s">
+      <default>'IDLE'</default>
+      <summary>Timer state</summary>
+      <description>Persisted state of the timer: IDLE, RUNNING or PAUSED.</description>
+    </key>
+    <key name="timer-kind" type="s">
+      <default>'POMODORO'</default>
+      <summary>Current interval kind</summary>
+      <description>Persisted kind of the current interval: POMODORO, SHORT_BREAK or LONG_BREAK.</description>
+    </key>
+    <key name="timer-slot" type="i">
+      <default>0</default>
+      <range min="0" max="12"/>
+      <summary>Consumed slots of the current set</summary>
+      <description>How many pomodoro slots of the current set have already been consumed.</description>
+    </key>
+    <key name="timer-end-wall-ms" type="x">
+      <default>0</default>
+      <summary>Wall-clock deadline</summary>
+      <description>Unix time in milliseconds at which the running interval ends, or zero when no interval is running.</description>
+    </key>
+    <key name="timer-remaining-ms" type="x">
+      <default>1500000</default>
+      <summary>Remaining time</summary>
+      <description>Remaining milliseconds of the current interval, frozen while paused.</description>
+    </key>
+    <key name="timer-started-wall-ms" type="x">
+      <default>0</default>
+      <summary>Wall-clock start of the current interval</summary>
+      <description>Unix time in milliseconds at which the current interval was started, or zero when no interval is open.</description>
+    </key>
+  </schema>
+</schemalist>
