@@ -10,7 +10,7 @@ import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/ex
 
 import {Kind, State, Timer} from './lib/timer.js';
 import {shouldAutoStart, isBreak} from './lib/schedule.js';
-import {fromSettingsValues, toSettingsValues} from './lib/state.js';
+import {fromSettingsValues} from './lib/state.js';
 import {dayKey, makeRecords, todayCount} from './lib/journal.js';
 import {appendRecords, journalPath, readRecords} from './lib/journalfile.js';
 import {GnomatoIndicator} from './ui/indicator.js';
