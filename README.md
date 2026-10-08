@@ -74,12 +74,16 @@ extension: a plain `--delete` protects excluded paths from deletion.
 
 ```sh
 rsync -a --delete --delete-excluded \
-      --exclude .git --exclude .superpowers --exclude docs --exclude tests \
+      --exclude .git --exclude .gitignore --exclude .superpowers \
+      --exclude docs --exclude tests --exclude CONTEXT.md \
       --exclude debian --exclude dist --exclude '*.deb' \
       --exclude README.md --exclude build-deb.sh \
       ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin/
 gnome-extensions enable gnomato@fstronin
 ```
+
+What lands there is the extension payload and `LICENSE`: `metadata.json`,
+`extension.js`, `prefs.js`, `lib/`, `ui/`, `schemas/`, `LICENSE`.
 
 Then, in order of how much they change:
 
