@@ -3,9 +3,11 @@
 import system from 'system';
 
 import {tests as formatTests} from './format.test.js';
+import {tests as scheduleTests} from './schedule.test.js';
 
 const suites = [
     ['format', formatTests],
+    ['schedule', scheduleTests],
 ];
 
 let passed = 0;
