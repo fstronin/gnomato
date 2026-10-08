@@ -6,12 +6,14 @@ import {tests as formatTests} from './format.test.js';
 import {tests as scheduleTests} from './schedule.test.js';
 import {tests as timerTests} from './timer.test.js';
 import {tests as journalTests} from './journal.test.js';
+import {tests as journalfileTests} from './journalfile.test.js';
 
 const suites = [
     ['format', formatTests],
     ['schedule', scheduleTests],
     ['timer', timerTests],
     ['journal', journalTests],
+    ['journalfile', journalfileTests],
 ];
 
 let passed = 0;
