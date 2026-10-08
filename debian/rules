@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+# Hand-written rules, no debhelper: the payload is a handful of files plus a
+# private GSettings schema, and everything the shell needs is installed as-is.
+
+UUID   := gnomato@fstronin
+STAGE  := $(CURDIR)/debian/gnomato
+EXTDIR := $(STAGE)/usr/share/gnome-shell/extensions/$(UUID)
+DOCDIR := $(STAGE)/usr/share/doc/gnomato
+
+.PHONY: build binary binary-arch binary-indep clean
+
+build:
+	glib-compile-schemas schemas/
+
+binary: binary-arch
+
+binary-indep: binary-arch
+
+binary-arch: build
+	install -d $(EXTDIR)/lib $(EXTDIR)/ui $(EXTDIR)/schemas $(DOCDIR) $(STAGE)/DEBIAN
+	install -m 0644 metadata.json extension.js prefs.js LICENSE $(EXTDIR)/
+	install -m 0644 lib/*.js $(EXTDIR)/lib/
+	install -m 0644 ui/*.js $(EXTDIR)/ui/
+	install -m 0644 schemas/*.gschema.xml $(EXTDIR)/schemas/
+	glib-compile-schemas --targetdir=$(EXTDIR)/schemas schemas/
+	chmod 0644 $(EXTDIR)/schemas/gschemas.compiled
+	install -m 0644 debian/copyright $(DOCDIR)/copyright
+	gzip -9nc debian/changelog > $(DOCDIR)/changelog.gz
+	chmod 0644 $(DOCDIR)/changelog.gz
+	dpkg-gencontrol -pgnomato -P$(STAGE)
+	dpkg-deb --root-owner-group --build $(STAGE) ..
+
+clean:
+	rm -rf $(STAGE)

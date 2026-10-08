@@ -1,0 +1,18 @@
+Source: gnomato
+Section: gnome
+Priority: optional
+Maintainer: Yegor Chuperka <yegor-chuperka@yandex.ru>
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: gnomato
+Architecture: all
+Depends: gnome-shell (>= 50)
+Description: Pomodoro timer for the GNOME Shell panel
+ Gnomato keeps one interval at a time in the panel: a pomodoro, a short
+ break or a long break, with the length of each configurable and the
+ countdown visible at a glance.
+ .
+ Finished, skipped and interrupted intervals are appended to a journal in
+ XDG_STATE_HOME, so the day's progress survives a shell restart or a
+ screen lock.

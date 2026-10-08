@@ -1,0 +1,7 @@
+gnomato (0.1.0) unstable; urgency=medium
+
+  * Initial release: panel countdown, configurable pomodoro and break lengths,
+    set order with auto-start policies, notifications with a theme sound,
+    preferences window, and an append-only journal of finished intervals.
+
+ -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Thu, 08 Oct 2026 12:00:00 +0000
