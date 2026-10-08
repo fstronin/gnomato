@@ -68,10 +68,12 @@ gjs -m tests/run-tests.js                # unit tests for lib/, no shell needed
 ```
 
 Install the working tree for the current user — only the extension itself
-belongs in the shell's extension directory:
+belongs in the shell's extension directory. `--delete-excluded` is what
+actually removes anything already sitting there that is not part of the
+extension: a plain `--delete` protects excluded paths from deletion.
 
 ```sh
-rsync -a --delete \
+rsync -a --delete --delete-excluded \
       --exclude .git --exclude .superpowers --exclude docs --exclude tests \
       --exclude debian --exclude dist --exclude '*.deb' \
       --exclude README.md --exclude build-deb.sh \
