@@ -1,63 +1,76 @@
 # Gnomato
 
-Расширение GNOME Shell, которое ведёт один Interval за раз по технике Помодоро и записывает, сколько времени фокусировки и отдыха набрано.
+A GNOME Shell extension that runs one Interval at a time on the Pomodoro
+technique and records how much focus time and rest time has been accumulated.
 
 ## Language
 
 **Pomodoro**:
-Один Interval работы — по умолчанию 25 минут.
+One work Interval — 25 minutes by default.
 _Avoid_: session, focus block, work unit, «фокус», «задача»
 
 **Break**:
-Перерыв между Pomodoro. Бывает **Short Break** (по умолчанию 5 минут) и **Long Break** (по умолчанию 15 минут).
+The rest between Pomodoros. It comes as a **Short Break** (5 minutes by default)
+and a **Long Break** (15 minutes by default).
 _Avoid_: rest, idle, «отдых»
 
 **Interval**:
-Родовое понятие для Pomodoro или Break — то, что Timer ведёт в данный момент.
+The umbrella term for a Pomodoro or a Break — whatever the Timer is running at
+the moment.
 _Avoid_: session, phase, period
 
 **Set**:
-N Pomodoro подряд, после которых идёт Long Break. N по умолчанию 4.
+N Pomodoros in a row, followed by a Long Break. N is 4 by default.
 _Avoid_: cycle, round, series, «комплект»
 
 **Slot**:
-Место Pomodoro внутри Set. Skip расходует слот так же, как завершение, поэтому Set не растягивается.
+A Pomodoro's place within a Set. Skip spends a slot exactly as a completion
+does, so a Set never stretches.
 _Avoid_: step, index, «шаг», «позиция в комплекте»
 
 **Timer**:
-Автомат, который ведёт ровно один Interval за раз и переводит счёт от одного Interval к следующему.
+The state machine that runs exactly one Interval at a time and moves the count
+from one Interval to the next.
 _Avoid_: session, engine, scheduler
 
 **Pause**:
-Приостановка счёта внутри текущего Interval: Interval остаётся тем же, остаток сохраняется.
+Suspending the count inside the current Interval: the Interval stays the same
+and the remainder is kept.
 _Avoid_: stop, hold
 
 **Skip**:
-Досрочное завершение текущего Interval с переходом к следующему; в отличие от Pause, Interval не возобновляется.
+Ending the current Interval early and moving on to the next one; unlike Pause,
+the Interval is not resumed.
 _Avoid_: stop, cancel, abort, «пропустить перерыв»
 
 **Journal**:
-Накопительная запись прошедших Interval: что шло, сколько длилось, чем закончилось.
+The accumulating record of past Intervals: what ran, how long it lasted, how it
+ended.
 _Avoid_: history, log, statistics
 
 **Today**:
-Локальные сутки, от полуночи до полуночи; единица, по которой считается «сегодня: N». Interval, пересекающий полночь, делится на две записи.
-_Avoid_: день, календарный день
+The local day, midnight to midnight; the unit "today: N" is counted in. An
+Interval crossing midnight is split into two records.
+_Avoid_: «день», «календарный день»
 
-## Как Interval заканчивается
+## How an Interval ends
 
 **Completed**:
-Interval отсчитан до конца: либо Timer его довёл, либо по возвращении обнаружилось, что дедлайн уже прошёл.
+The Interval was counted to the end: either the Timer carried it there, or the
+deadline was found to have passed already when you came back.
 _Avoid_: done, finished
 
 **Skipped**:
-Interval закрыт командой Skip — расходует слот Set, но в число завершённых Pomodoro не входит.
+The Interval was closed by Skip — it spends a Slot of the Set, but does not count
+towards the completed Pomodoros.
 _Avoid_: cancelled, dropped
 
 **Aborted**:
-Interval прерван командой Reset; набранное время сохраняется как фактическое.
+The Interval was cut short by Reset; the time actually spent is kept as the
+actual time.
 _Avoid_: stopped, failed
 
 **Restored**:
-Отметка на записи Interval, закрытого по обнаруженному прошедшему дедлайну, а не по отсчёту: в этот момент Timer не работал.
+A mark on the record of an Interval closed because its deadline had already
+passed rather than by counting it down: the Timer was not running at that moment.
 _Avoid_: recovered, восстановленный
