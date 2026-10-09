@@ -1,6 +1,7 @@
 #!/bin/sh
 # Build the Debian package out of a clean copy of the tree: the repository also
-# carries tests, docs and this script, none of which belong in the package.
+# carries tests, docs, the screenshot harness and this script, none of which
+# belong in the package.
 # The package version comes from debian/changelog alone.
 set -eu
 
@@ -19,6 +20,7 @@ rsync -a \
     --exclude .superpowers \
     --exclude docs \
     --exclude tests \
+    --exclude tools \
     --exclude dist \
     --exclude '*.deb' \
     ./ "$work/${name}-${version}/"
