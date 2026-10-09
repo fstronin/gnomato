@@ -1,0 +1,7 @@
+{
+  "uuid": "gnomato-shot@test",
+  "name": "Gnomato screenshot harness",
+  "description": "Throwaway driver that poses the real Gnomato UI and crops the README screenshots out of a headless shell.",
+  "shell-version": ["50"],
+  "version": 1
+}

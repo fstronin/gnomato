@@ -1,8 +1,24 @@
 # Gnomato
 
+<p align="center">
+  <img src="docs/images/hero-running.png" width="520"
+       alt="The Gnomato popup open below the panel while a pomodoro counts down">
+</p>
+
+<p align="center">
+  <a href="metadata.json"><img src="https://img.shields.io/badge/GNOME%20Shell-50-4a86cf?logo=gnome&amp;logoColor=white" alt="GNOME Shell 50"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--2.0-blue" alt="License: GPL-2.0"></a>
+</p>
+
 A Pomodoro timer for the GNOME Shell panel: one interval at a time — a pomodoro,
 a short break or a long break — with the countdown visible at a glance and a
 journal of what actually happened.
+
+An interval is a commitment on the wall clock: it ends at `start + length`
+regardless of suspend, screen lock or whether you were at the keyboard. If the
+deadline passes while the timer is not running, the interval is closed and
+marked `restored` in the journal. See
+[docs/adr/0001-wall-clock-interval-semantics.md](docs/adr/0001-wall-clock-interval-semantics.md).
 
 | | |
 |---|---|
@@ -14,10 +30,45 @@ journal of what actually happened.
 | Journal | Append-only JSONL of finished, skipped and interrupted intervals |
 | Keys | Optional global shortcuts, unassigned by default |
 
-An interval is a commitment on the wall clock: it ends at `start + length`
-regardless of suspend, screen lock or whether you were at the keyboard. If the
-deadline passes while the timer is not running, the interval is closed and
-marked `restored` in the journal. See `docs/adr/0001-wall-clock-interval-semantics.md`.
+## Screenshots
+
+The panel when idle, counting down, paused, and counting down a break.
+
+<p align="center">
+  <img src="docs/images/panel-idle.png" width="420" alt="The panel with the Gnomato icon alone">
+  <img src="docs/images/panel-running.png" width="420" alt="The panel with the Gnomato icon and the remaining time">
+</p>
+<p align="center">
+  <img src="docs/images/panel-paused.png" width="420" alt="The panel with the remaining time and a pause mark">
+  <img src="docs/images/panel-break.png" width="420" alt="The panel counting down a break">
+</p>
+
+The popup: a pomodoro running, the same interval paused with the ring held where
+it stopped, and the plan for the next interval while nothing is running.
+
+<p align="center">
+  <img src="docs/images/popup-running.png" width="280" alt="The popup while a pomodoro runs">
+  <img src="docs/images/popup-paused.png" width="280" alt="The popup while the interval is paused">
+  <img src="docs/images/popup-idle.png" width="280" alt="The popup while nothing is running">
+</p>
+
+A break wears its own colour and says which one it is; the long break ends the
+set with all four slots spent; the right click gives the day's count.
+
+<p align="center">
+  <img src="docs/images/popup-break.png" width="280" alt="The popup during a short break">
+  <img src="docs/images/popup-long-break.png" width="280" alt="The popup during a long break">
+  <img src="docs/images/menu.png" width="280" alt="The right-click menu showing today's count and Preferences">
+</p>
+
+Preferences cover the durations, the set and its size, the behaviour, the
+shortcuts and the journal path.
+
+<p align="center">
+  <img src="docs/images/prefs.png" width="480" alt="The Gnomato preferences window">
+</p>
+
+The screenshots are of the real extension, at the sizes the shell draws it.
 
 ## Requirements
 
@@ -76,7 +127,7 @@ extension: a plain `--delete` protects excluded paths from deletion.
 ```sh
 rsync -a --delete --delete-excluded \
       --exclude .git --exclude .gitignore --exclude .superpowers \
-      --exclude docs --exclude tests --exclude CONTEXT.md --exclude AGENTS.md \
+      --exclude docs --exclude tests --exclude tools --exclude CONTEXT.md --exclude AGENTS.md \
       --exclude debian --exclude dist --exclude '*.deb' --exclude .scratch \
       --exclude README.md --exclude build-deb.sh \
       ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin/
@@ -104,6 +155,23 @@ Two things to know about this machine specifically:
 - A uuid cannot live in both `~/.local/share/gnome-shell/extensions/` and
   `/usr/share/gnome-shell/extensions/`: remove the development copy before
   installing the package, or the shell reports a version mismatch.
+
+### Screenshots
+
+`docs/images/` is generated, not drawn. `tools/screenshots/run.sh` starts a
+headless GNOME Shell whose only output is a virtual monitor, loads the real
+extension into it together with a throwaway probe, poses each state and crops
+the compositor's own output:
+
+```sh
+tools/screenshots/run.sh                 # the set the README uses, ~10 minutes
+MODE=quick tools/screenshots/run.sh      # same poses, no wait, to check the rig
+```
+
+The wait is real: the headline shot is a default-length pomodoro part way
+through, and the day's count comes from a real finished interval. The shell
+runs with a private `XDG_RUNTIME_DIR` and a keyfile settings backend, so the
+real session is never touched.
 
 ## Design
 
