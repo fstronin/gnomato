@@ -14,7 +14,7 @@
 | Модули shell | `resource:///org/gnome/shell/ui/main.js`, `ui/panelMenu.js` (`Button`), `ui/popupMenu.js` (`PopupMenu`, `PopupMenuItem`, `PopupSeparatorMenuItem`), `ui/messageTray.js`, `ui/quickSettings.js`, `extensions/extension.js` (`Extension`, `gettext`) |
 | `St` CSS | `inset box-shadow` рисуется только у узла, у которого есть рамка или фон с ненулевой альфой (`st_theme_node_paint`, условие `has_inset_box_shadow && (has_border \|\| background_color.alpha > 0)`), поэтому контур пустого слота — рамка, а не тень; `min-width`/`min-height` из CSS задают размер и обычному `St.Widget` |
 | Иконки | `alarm-symbolic` и `media-playback-pause-symbolic` есть и в Adwaita, и в Yaru |
-| Звук | `global.display.get_sound_player()` с `play_from_theme` — тот же путь, что использует сам shell; `GSound-1.0.typelib` **отсутствует**; `Gst-1.0`/`GstPlay-1.0` есть, но не нужны; `/usr/share/sounds/freedesktop/stereo/complete.oga` существует |
+| Звук | `global.display.get_sound_player()` — это `Meta.SoundPlayer` из mutter, обёртка над libcanberra, и у него только `play_from_theme`/`play_from_file`; вызов fire-and-forget: значения не возвращает и ошибок не бросает, поэтому ловить в `try/catch` нечего, а промах по имени события играет молча ничего. `theme-name` и `event-sounds` mutter применяет сам (`CA_PROP_CANBERRA_ENABLE`/`XDG_THEME_NAME`). `GSound-1.0.typelib` отсутствует и не нужен; `Gst-1.0`/`GstPlay-1.0` тоже не нужны. Yaru не объявляет `Inherits`, до `freedesktop` libcanberra добирается сам: `alarm-clock-elapsed` (6.1 с) есть только в freedesktop, `complete` (0.9 с) — и там, и в Yaru |
 | Настройки | `org.gnome.desktop.sound` (`event-sounds`, `theme-name`); `org.gnome.desktop.notifications` (`show-banners`, `show-in-lock-screen`) |
 | Предпочтения | `gnome-extensions prefs <uuid>` работает через D-Bus-сервис `org.gnome.Shell.Extensions` (отдельный процесс gjs) даже без `gnome-extensions-app`; доступны `Adw-1`, `Gtk-4.0` |
 | Схема расширения | компилируется `glib-compile-schemas` в `<extdir>/<uuid>/schemas/gschemas.compiled`, `this.getSettings()` берёт id из `settings-schema` |
@@ -28,7 +28,7 @@
 | Область | Решение |
 |---|---|
 | Форма продукта | Только расширение shell, без демона и без отдельного приложения. Состояние живёт вне процесса (GSettings + файл Journal), поэтому `restart` шелла и `reload` расширения его не теряют |
-| Имя | `uuid` = `gnomato@fstronin`, `name` = `Gnomato`, `settings-schema` = `org.gnome.shell.extensions.gnomato`, `shell-version` = `["50"]` |
+| Имя | `uuid` = `gnomato@fstronin.github.io`, `name` = `Gnomato`, `settings-schema` = `org.gnome.shell.extensions.gnomato`, `shell-version` = `["50"]` |
 | Автомат | `state` ∈ IDLE/RUNNING/PAUSED × `kind` ∈ POMODORO/SHORT_BREAK/LONG_BREAK + позиция в Set; команды `start`, `toggle pause`, `skip`, `reset` |
 | Семантика времени | Interval — обязательство по настенным часам: конец = старт + длительность, независимо от сна, блокировки экрана и отсутствия пользователя. Авто-пауз нет. Хранится метка конца, а не накопленные тики; обратный скачок часов компенсируется сдвигом метки |
 | Завершение | Дескриптор проверяется на каждом тике и при восстановлении. Дедлайн в прошлом → Completed; если Timer в этот момент не работал (restart шелла, экран блокировки, сон) — запись помечается `restored: true`. Правило одно для всех разрывов, порога нет |
@@ -44,16 +44,17 @@
 | Хоткеи | Ключи `as` в схеме с пустыми дефолтами: по умолчанию глобальных акселераторов нет, пользователь назначает сам в prefs |
 | Prefs | `Adw.PreferencesWindow`: Длительности (целые минуты 1–180, в схеме секунды), Set (1–12), Поведение (авто-старт перерывов, авто-старт работы, звук), Клавиши (два акселератора), Данные (путь к Journal). Длительности применяются со следующего Interval, размер Set — со следующего Set |
 | Уведомления | Баннер на каждое завершение Interval — и на конец Pomodoro, и на конец Break. Системный DND уважается, ничего не форсируем |
-| Звук | `global.display.get_sound_player().play_from_theme('complete', …)`, звук из темы, своих ассетов нет. Один переключатель `sound-enabled`; играем, только если включены и он, и системный `event-sounds` |
+| Звук | Cue — это звук того Interval, который начинается: POMODORO → `alarm-clock-elapsed`, перерыв → `complete`. Звук из темы, своих ассетов нет. Завершение объявляет cue следующего Interval сразу, даже если авто-старт выключен, поэтому один и тот же звук значит «начинается работа» или «начинается перерыв» и в начале, и в конце. Пометка «уже объявлен» гасит повтор, когда ручной Start запускает ровно тот Interval, который только что объявило завершение; Skip и Reset её снимают (следующий Interval никто не объявлял), Pause→Resume не звучит. Один переключатель `sound-enabled`, своих проверок системного `event-sounds` нет — его применяет mutter |
 | Экран блокировки | `session-modes` не объявляем: на экране блокировки расширения нет, отсчёта там нет. При возврате `enable()` пересчитывает состояние и показывает сводный баннер, если Interval завершился в отсутствие Timer |
-| i18n | Строки английские, через `gettext`; `gettext-domain` = `gnomato@fstronin`; каталог `po/` не заводим, пока нет перевода (`msgfmt` в системе нет, и `gnome-extensions pack` с `po/` упадёт) |
+| i18n | Строки английские, через `gettext`; `gettext-domain` = `gnomato@fstronin.github.io`; каталог `po/` не заводим, пока нет перевода (`msgfmt` в системе нет, и `gnome-extensions pack` с `po/` упадёт) |
 | Репозиторий | Файлы расширения в корне, GPL-2.0 + SPDX-заголовки, один `extension.js` для жизненного цикла и отдельные модули для логики и UI, сборки нет |
-| Поставка | Dev-loop в `~/.local/share/gnome-shell/extensions/gnomato@fstronin`; релиз — deb-пакет в `/usr/share/gnome-shell/extensions/gnomato@fstronin` по образцу `hwlogo`. Один uuid не может стоять одновременно в обоих местах |
-| Проверка | Логика (автомат, Set, остаток от дедлайна, разбиение по полуночи, формирование записи, маппинг в GSettings, доля кольца и состояние слотов Set) — скрипты-ассерты под `gjs` вне shell; UI, попап, жесты, уведомления, звук, prefs — руками в живой сессии |
+| Поставка | Dev-loop в `~/.local/share/gnome-shell/extensions/gnomato@fstronin.github.io`; релиз — deb-пакет в `/usr/share/gnome-shell/extensions/gnomato@fstronin.github.io` по образцу `hwlogo`. Оба каталога могут существовать одновременно: шелл пишет в лог «already installed in user dir … will not be loaded» и грузит user-копию, то есть dev-копия затеняет пакет |
+| Публикация | extensions.gnome.org: zip из `gnome-extensions pack` с `--extra-source=lib --extra-source=ui`; в `metadata.json` нет `version` (его ставит сайт), номер версии виден через `version-name`. Id схемы не привязан к uuid, поэтому переименование uuid не теряет ни настройки, ни Journal. Процедура — `docs/PUBLISHING.md` |
+| Проверка | Логика (автомат, Set, остаток от дедлайна, разбиение по полуночи, формирование записи, маппинг в GSettings, доля кольца и состояние слотов Set) — скрипты-ассерты под `gjs` вне shell; UI, попап, жесты, уведомления, prefs — руками в живой сессии. Cue: какие id доходят до плеера, проверяет `tools/cue-probe/run.sh` в headless-шелле (слушать там нечего — сервера звука нет), различимость — слухом в живой сессии |
 
 ## Вне области
 
-Авто-пауза по бездействию и блокировке экрана; метки задач, списки задач; статистика, графики, серии, экспорт; блокировка сайтов и приложений; переключение системного DND/Focus Mode; отсчёт на экране блокировки; публикация на extensions.gnome.org; каталоги переводов; ротация Journal.
+Авто-пауза по бездействию и блокировке экрана; метки задач, списки задач; статистика, графики, серии, экспорт; блокировка сайтов и приложений; переключение системного DND/Focus Mode; отсчёт на экране блокировки; каталоги переводов; ротация Journal.
 
 ## Уточнения, найденные при написании плана
 

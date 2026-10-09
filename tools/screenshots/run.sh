@@ -42,7 +42,7 @@ chmod 700 "$ROOT/run"
 printf '{"mode":"%s","background":"%s","shotsDir":"%s"}' "$MODE" "$BKG" "$SHOTS" > "$ROOT/config.json"
 
 # Only the extension itself goes into the throwaway shell's extension dir.
-DEST="$ROOT/data/gnome-shell/extensions/gnomato@fstronin"
+DEST="$ROOT/data/gnome-shell/extensions/gnomato@fstronin.github.io"
 mkdir -p "$DEST" "$ROOT/data/gnome-shell/extensions/gnomato-shot@test"
 rsync -a \
   --exclude .git --exclude .gitignore --exclude .superpowers --exclude .scratch \

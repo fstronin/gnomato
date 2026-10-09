@@ -19,7 +19,7 @@ import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const UUID = 'gnomato@fstronin';
+const UUID = 'gnomato@fstronin.github.io';
 const ROOT = GLib.getenv('GN_SHOT_ROOT') ?? '/tmp/gnomato-screenshots';
 const CONFIG = `${ROOT}/config.json`;
 const REPORT = `${ROOT}/report.json`;

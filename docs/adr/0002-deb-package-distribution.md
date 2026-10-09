@@ -1,6 +1,6 @@
 # Поставка deb-пакетом в /usr/share, а не через extensions.gnome.org
 
-Расширение можно ставить user-local (`gnome-extensions pack` + `install --force` либо симлинк из репозитория) или системно — deb-пакетом в `/usr/share/gnome-shell/extensions/gnomato@fstronin`, как `hwlogo`. Решили второй вариант, потому что остальные расширения @fstronin распространяются именно так: одна процедура установки и обновления на все свои расширения (`gnome-extensions enable gnomato@fstronin` плюс повторный вход в сессию на Wayland), а не два разных ритуала.
+Расширение можно ставить user-local (`gnome-extensions pack` + `install --force` либо симлинк из репозитория) или системно — deb-пакетом в `/usr/share/gnome-shell/extensions/gnomato@fstronin.github.io`, как `hwlogo`. Решили второй вариант, потому что остальные расширения @fstronin распространяются именно так: одна процедура установки и обновления на все свои расширения (`gnome-extensions enable gnomato@fstronin.github.io` плюс повторный вход в сессию на Wayland), а не два разных ритуала.
 
 Цена решения: итерации идут через переустановку пакета, а не через горячую перезагрузку расширения. Поэтому metadata остаётся совместимым с extensions.gnome.org (точный `shell-version` без заявок на будущие версии, никаких legacy `imports.*`, никакого Gtk в `extension.js`, схема с id `org.gnome.shell.extensions.*`, GPL-2.0), чтобы публикация позже была добавлением канала, а не переписыванием. Оба канала могут существовать одновременно.
 

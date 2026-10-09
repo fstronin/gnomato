@@ -26,7 +26,7 @@ marked `restored` in the journal. See
 | Popup | Left click: a countdown ring, the interval in words, the set as a row of tomatoes, and start/pause, skip and reset as round buttons |
 | Menu | Right click: today's finished pomodoros and Preferences |
 | Intervals | Configurable pomodoro and break lengths, a set of N pomodoros ending in a long break |
-| Behaviour | Breaks start themselves, pomodoros do not; a sound and a banner when an interval ends |
+| Behaviour | Breaks start themselves, pomodoros do not; each interval begins with its own cue (an alarm for a pomodoro, a chime for a break) and ends with a banner |
 | Journal | Append-only JSONL of finished, skipped and interrupted intervals |
 | Keys | Optional global shortcuts, unassigned by default |
 
@@ -80,24 +80,24 @@ The screenshots are of the real extension, at the sizes the shell draws it.
 ```sh
 ./build-deb.sh
 sudo dpkg -i dist/gnomato_0.2.0_all.deb
-gnome-extensions enable gnomato@fstronin
+gnome-extensions enable gnomato@fstronin.github.io
 ```
 
 On Wayland a new extension is only picked up by a freshly started shell, so log
 out and back in after installing. Check the result with:
 
 ```sh
-gnome-extensions info gnomato@fstronin   # State: ACTIVE
+gnome-extensions info gnomato@fstronin.github.io   # State: ACTIVE
 ```
 
 Preferences (durations, set size, behaviour, shortcuts, journal path):
 
 ```sh
-gnome-extensions prefs gnomato@fstronin
+gnome-extensions prefs gnomato@fstronin.github.io
 ```
 
 The package installs to
-`/usr/share/gnome-shell/extensions/gnomato@fstronin/`, compiles the GSettings
+`/usr/share/gnome-shell/extensions/gnomato@fstronin.github.io/`, compiles the GSettings
 schema into that directory at build time and needs no post-install step.
 
 ## Journal
@@ -130,8 +130,8 @@ rsync -a --delete --delete-excluded \
       --exclude docs --exclude tests --exclude tools --exclude CONTEXT.md --exclude AGENTS.md \
       --exclude debian --exclude dist --exclude '*.deb' --exclude .scratch \
       --exclude README.md --exclude build-deb.sh \
-      ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin/
-gnome-extensions enable gnomato@fstronin
+      ./ ~/.local/share/gnome-shell/extensions/gnomato@fstronin.github.io/
+gnome-extensions enable gnomato@fstronin.github.io
 ```
 
 What lands there is the extension payload and `LICENSE`: `metadata.json`,
@@ -140,7 +140,7 @@ What lands there is the extension payload and `LICENSE`: `metadata.json`,
 
 Then, in order of how much they change:
 
-- `gnome-extensions disable gnomato@fstronin && gnome-extensions enable gnomato@fstronin`
+- `gnome-extensions disable gnomato@fstronin.github.io && gnome-extensions enable gnomato@fstronin.github.io`
   re-runs `enable()`/`disable()`. That is enough for `stylesheet.css` — the shell
   reloads it on every enable, so the look of the popup can be iterated without a
   new session — and for anything else except the modules themselves.
@@ -150,11 +150,16 @@ Then, in order of how much they change:
 
 Two things to know about this machine specifically:
 
-- `gnome-extensions pack` crashes with SIGSEGV here (even on a trivial
-  extension), so the working tree is copied into place instead of packed.
-- A uuid cannot live in both `~/.local/share/gnome-shell/extensions/` and
-  `/usr/share/gnome-shell/extensions/`: remove the development copy before
-  installing the package, or the shell reports a version mismatch.
+- `gnome-extensions pack` takes only `metadata.json`, `extension.js`, `prefs.js`,
+  `stylesheet.css`, `schemas/` and `locale/` by default, so the bundle is missing
+  `lib/` and `ui/` unless they are named: `--extra-source=lib --extra-source=ui`.
+  Such a bundle looks complete and fails to import inside the shell. The upload
+  we ship is built this way — see `docs/PUBLISHING.md`.
+- The same uuid in `~/.local/share/gnome-shell/extensions/` and
+  `/usr/share/gnome-shell/extensions/` is not an error: the shell logs
+  "already installed in user dir … will not be loaded" and runs the user copy,
+  ignoring the package. A development copy therefore shadows an installed
+  package, and the two drift apart silently.
 
 ### Screenshots
 
@@ -177,6 +182,7 @@ real session is never touched.
 
 - `CONTEXT.md` — the vocabulary (Pomodoro, Break, Interval, Set, Timer, Journal)
 - `docs/spec.md` — the settled design, environment facts and what is out of scope
+- `docs/PUBLISHING.md` — building and uploading a version to extensions.gnome.org
 - `docs/adr/` — decisions that are expensive to reverse, with the reasoning
 - `docs/superpowers/plans/` — the implementation plan this code was built from
 
