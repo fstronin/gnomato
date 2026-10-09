@@ -48,7 +48,7 @@ export default class GnomatoPreferences extends ExtensionPreferences {
         behaviour.add(this._switchRow(settings, 'auto-start-work',
             this.gettext('Start pomodoros automatically')));
         behaviour.add(this._switchRow(settings, 'sound-enabled',
-            this.gettext('Sound when an interval ends')));
+            this.gettext('Sound cues when intervals begin and end')));
 
         const keys = new Adw.PreferencesGroup({
             title: this.gettext('Keys'),

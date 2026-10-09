@@ -37,8 +37,8 @@
     </key>
     <key name="sound-enabled" type="b">
       <default>true</default>
-      <summary>Sound at the end of an interval</summary>
-      <description>Play the theme sound when an interval finishes. The system event sound setting is respected as well.</description>
+      <summary>Sound cues for intervals</summary>
+      <description>Play the cue of the interval that is beginning: an alarm when a pomodoro begins, a chime when a break begins. A completion announces the cue of the interval it advances to, so the two kinds never sound alike. The system event sound setting applies as well.</description>
     </key>
     <key name="toggle-keybinding" type="as">
       <default>[]</default>

@@ -1,3 +1,14 @@
+gnomato (0.3.0) unstable; urgency=medium
+
+  * Sound cues per interval kind: a pomodoro begins with an alarm and a break
+    with a chime. A completion announces the cue of the interval it advances
+    to, so the cue sounds even when the next interval does not start itself,
+    and a start right after a completion does not repeat it. The behaviour
+    switch is relabelled accordingly; the system event-sound setting keeps
+    silencing the cues.
+
+ -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Fri, 09 Oct 2026 12:00:00 +0000
+
 gnomato (0.2.0) unstable; urgency=medium
 
   * Panel popup: a countdown ring, the interval in words, the set as a row of

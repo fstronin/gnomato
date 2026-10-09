@@ -1,0 +1,6 @@
+{
+  "uuid": "cue-probe@test",
+  "name": "Cue probe",
+  "description": "Throwaway probe for tools/cue-probe: records the cue ids the extension hands to the sound player.",
+  "shell-version": ["50"]
+}

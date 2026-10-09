@@ -17,12 +17,26 @@ import {GnomatoIndicator} from './ui/indicator.js';
 
 const INTERVAL_KEYS = ['pomodoro-seconds', 'short-break-seconds', 'long-break-seconds'];
 
+/**
+ * The cue is the sound of the Interval that is beginning: a pomodoro gets the
+ * alarm that calls you back to work, a break the chime that lets you go. Every
+ * completion announces the cue of the Interval it advances to, so the two kinds
+ * can never be confused for one another.
+ */
+const CUE_FOR = {
+    [Kind.POMODORO]: 'alarm-clock-elapsed',
+    [Kind.SHORT_BREAK]: 'complete',
+    [Kind.LONG_BREAK]: 'complete',
+};
+
 export default class GnomatoExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
-        this._soundSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.sound'});
         this._tickId = 0;
         this._signalIds = [];
+        // Whether the pending Interval's cue has already sounded at its
+        // boundary; the Start that begins it then stays quiet.
+        this._cueAnnounced = false;
 
         this._timer = new Timer({
             durations: this._durations(),
@@ -87,7 +101,7 @@ export default class GnomatoExtension extends Extension {
         // settings object: flushing the pending writes is a global operation.
         Gio.Settings.sync();
         this._settings = null;
-        this._soundSettings = null;
+        this._cueAnnounced = false;
         this._timer = null;
     }
 
@@ -125,18 +139,30 @@ export default class GnomatoExtension extends Extension {
             this._timer.pause();
         else if (this._timer.state === State.PAUSED)
             this._timer.resume();
-        else
+        else {
             this._timer.start();
+            // A completion announced this very Interval as it ended; beginning
+            // it now must not sound the same cue a second time.
+            if (this._cueAnnounced)
+                this._cueAnnounced = false;
+            else
+                this._playCue(this._timer.kind);
+        }
         this._afterTransition();
     }
 
     _skip() {
         this._writeRecords(this._timer.skip());
+        // The Interval that follows was never announced, so its cue has to
+        // sound when it begins.
+        this._cueAnnounced = false;
         this._afterTransition();
     }
 
     _reset() {
         this._writeRecords(this._timer.reset());
+        // Rewound: the same Interval begins again, and it is unannounced.
+        this._cueAnnounced = false;
         this._afterTransition();
     }
 
@@ -206,10 +232,9 @@ export default class GnomatoExtension extends Extension {
     }
 
     /**
-     * One banner per finished interval, plus the theme sound. A restored
-     * completion happened while the timer was not running, so it says so.
-     * A skipped or reset interval gets neither: it was not a transition the
-     * user could miss.
+     * One banner per finished interval, plus its cue. A restored completion
+     * happened while the timer was not running, so it says so. A skipped or
+     * reset interval gets neither: it was not a transition the user could miss.
      */
     _announce(event) {
         const isBreakKind = isBreak(event.record.kind);
@@ -229,21 +254,26 @@ export default class GnomatoExtension extends Extension {
         }
 
         Main.notify(title, body);
-        this._playSound();
+        // The completed Interval has already advanced to the next one, and the
+        // cue belongs to that Interval: it sounds here even when nothing
+        // auto-starts, since the user is being told what comes next.
+        this._cueAnnounced = this._playCue(this._timer.kind) !== null;
     }
 
-    /** The sound comes from the theme, gated by both our switch and the system one. */
-    _playSound() {
+    /**
+     * The Cue of the Interval that is beginning, or null when sound is off.
+     * It comes from the sound theme; the system event-sound switch is applied
+     * inside Mutter, which hands the request to libcanberra. That call is
+     * fire-and-forget — it has no error path, so a refusal is silent — and the
+     * id is returned for the headless harness, which has no audio server.
+     */
+    _playCue(kind) {
         if (!this._settings.get_boolean('sound-enabled'))
-            return;
-        if (!this._soundSettings.get_boolean('event-sounds'))
-            return;
+            return null;
 
-        try {
-            global.display.get_sound_player().play_from_theme('complete', _('Pomodoro timer'), null);
-        } catch (e) {
-            console.error(`gnomato: cannot play the sound: ${e.message}`);
-        }
+        const eventId = CUE_FOR[kind];
+        global.display.get_sound_player().play_from_theme(eventId, _('Pomodoro timer'), null);
+        return eventId;
     }
 
     _shouldAutoStart() {

@@ -53,6 +53,15 @@ The local day, midnight to midnight; the unit "today: N" is counted in. An
 Interval crossing midnight is split into two records.
 _Avoid_: «день», «календарный день»
 
+## How an Interval begins
+
+**Cue**:
+The sound that marks an Interval beginning: the Pomodoro cue when a Pomodoro
+begins, the Break cue when a Break begins. The two are different sounds, and a
+completion announces the incoming Interval's Cue as the Interval ends, so the
+Cue sounds even when the next Interval does not start itself.
+_Avoid_: sound, signal, «звонок»
+
 ## How an Interval ends
 
 **Completed**:
