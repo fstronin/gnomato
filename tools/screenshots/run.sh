@@ -89,6 +89,16 @@ PY
   gset org.gnome.desktop.background picture-uri-dark "file://$ROOT/wall.png"
 fi
 
+# The environment has to be set *before* dbus-run-session: dbus-daemon hands
+# its own environment to everything it activates, and the preferences window is
+# a D-Bus activated gjs service of its own. With these inside the inner script
+# the prefs window read the real dconf and the real HOME -- the screenshot then
+# showed the developer's settings, not the ones this harness set up.
+export HOME="$ROOT/home" XDG_DATA_HOME="$ROOT/data" XDG_CONFIG_HOME="$ROOT/config"
+export XDG_STATE_HOME="$ROOT/state" XDG_CACHE_HOME="$ROOT/cache"
+export GSETTINGS_BACKEND=keyfile
+export LIBGL_ALWAYS_SOFTWARE=1
+export GN_SHOT_ROOT="$ROOT"
 # A private runtime dir keeps this shell, and anything D-Bus activated for it,
 # off the real session's sockets.
 export XDG_RUNTIME_DIR="$ROOT/run"
@@ -97,12 +107,6 @@ export GDK_BACKEND=wayland
 
 timeout "$TIMEOUT" dbus-run-session -- bash -s <<INNER
 set -u
-export HOME=$ROOT/home XDG_DATA_HOME=$ROOT/data XDG_CONFIG_HOME=$ROOT/config
-export XDG_STATE_HOME=$ROOT/state XDG_CACHE_HOME=$ROOT/cache
-export GSETTINGS_BACKEND=keyfile
-export LIBGL_ALWAYS_SOFTWARE=1
-export XDG_RUNTIME_DIR=$ROOT/run WAYLAND_DISPLAY=wayland-0 GDK_BACKEND=wayland
-export GN_SHOT_ROOT=$ROOT
 
 gnome-shell --wayland --headless --virtual-monitor $VM > $ROOT/shell.log 2>&1 &
 SHELL_PID=\$!
