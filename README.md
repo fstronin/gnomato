@@ -23,7 +23,7 @@ marked `restored` in the journal. See
 | | |
 |---|---|
 | Panel | Countdown while an interval runs, a pause mark while it is paused, the icon alone when idle |
-| Popup | Left click: a countdown ring, the interval in words, the set as a row of tomatoes, and start/pause, skip and reset as round buttons |
+| Popup | Left click: a countdown ring, the interval in words, the set as a row of tomatoes (a count instead, when the row would not fit), and start/pause, skip and reset as round buttons |
 | Menu | Right click: today's finished pomodoros, the way to reset that count, and Preferences |
 | Intervals | Configurable pomodoro and break lengths, a set of N pomodoros ending in a long break |
 | Behaviour | Breaks start themselves, pomodoros do not; a finished interval ends with a banner and announces the next one with its own cue (an alarm for a pomodoro, a chime for a break), while an interval you start by hand is silent |

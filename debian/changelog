@@ -9,6 +9,12 @@ gnomato (0.4.0) unstable; urgency=medium
     button or the shortcut — is silent: the cue is what announces the interval
     the completion advanced to.
 
+  * The row of tomatoes falls back to a count only when it does not fit: the fit
+    is measured against the popup's own width instead of the fixed threshold of
+    six slots that used to decide it. That threshold no longer had a meaning —
+    at 280 px of content width fourteen tomatoes fit, and a set is capped at
+    twelve.
+
  -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Sat, 10 Oct 2026 13:55:52 +0200
 
 gnomato (0.3.0) unstable; urgency=medium

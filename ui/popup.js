@@ -11,7 +11,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {formatRemaining} from '../lib/format.js';
-import {ringFraction, setProgress} from '../lib/progress.js';
+import {ringFraction, rowFits, setProgress} from '../lib/progress.js';
 import {Kind, State} from '../lib/timer.js';
 
 const PLAY_ICON_NAME = 'media-playback-start-symbolic';
@@ -203,6 +203,9 @@ export class GnomatoPopup extends PopupMenu.PopupMenu {
         super(sourceActor, 0.0, St.Side.TOP);
 
         this._plannedMs = 0;
+        // The set as the popup was last told about it: a restyle and an open
+        // both fit the row again, so both need to know what to draw.
+        this._progress = null;
 
         this.actor.add_style_class_name('gnomato-popup');
         this.box.add_style_class_name('gnomato-popup-content');
@@ -277,9 +280,19 @@ export class GnomatoPopup extends PopupMenu.PopupMenu {
         this.box.add_child(controls);
 
         this.connect('open-state-changed', (menu, open) => {
-            if (!open)
+            if (!open) {
                 this._tooltip.close();
+                return;
+            }
+            // A popup that has never been shown measures nothing, so the row is
+            // fitted again over the width it has now — the first open included.
+            this._renderSet();
         });
+
+        // The width the row is fitted into comes from the stylesheet, the theme
+        // and the font, and all three move under a running popup.
+        for (const actor of [this.box, this._tomatoes])
+            actor.connect('style-changed', () => this._renderSet());
     }
 
     /**
@@ -301,8 +314,9 @@ export class GnomatoPopup extends PopupMenu.PopupMenu {
         this._kindLabel.text = kindLabel(kind);
         this._pauseIcon.visible = state === State.PAUSED;
         this._ring.fraction = ringFraction(remainingMs, plannedMs);
-        this._renderSet(setProgress(slot, setSize,
-            state === State.IDLE ? null : kind));
+        this._progress = setProgress(slot, setSize,
+            state === State.IDLE ? null : kind);
+        this._renderSet();
 
         const running = state !== State.IDLE;
         this._mainIcon.icon_name = state === State.RUNNING
@@ -354,28 +368,70 @@ export class GnomatoPopup extends PopupMenu.PopupMenu {
         this.box.add_style_class_name(STATE_CLASSES[state]);
     }
 
-    _renderSet(progress) {
-        this._tomatoes.destroy_all_children();
-
-        if (progress.compact) {
-            this._tomatoes.add_child(new St.Label({
-                text: progress.label,
-                style_class: 'gnomato-tomatoes-label',
-            }));
+    /**
+     * The row of tomatoes, or the count in the place of it when the row is
+     * wider than the popup has room for.
+     *
+     * The fit is measured, never assumed: the width the popup has for the row
+     * is read with the tomatoes empty, the row is built, and the row is kept
+     * only if what it asks for is inside what there is. Everything else the
+     * popup holds — the ring, the buttons — is wider than the count, so the
+     * width read this way is the popup's own, and a row is fitted into the
+     * popup rather than the other way round: the popup is the same width
+     * whether the row or the count stands there. The count is never in the way
+     * of the row — it goes in only where the row cannot.
+     */
+    _renderSet() {
+        const progress = this._progress;
+        if (!progress)
             return;
-        }
 
-        for (const slot of progress.slots) {
-            const classes = ['gnomato-tomato'];
-            if (slot.filled)
-                classes.push('gnomato-tomato--filled');
-            if (slot.current)
-                classes.push('gnomato-tomato--current');
-            this._tomatoes.add_child(new St.Widget({
-                style_class: classes.join(' '),
-                y_align: Clutter.ActorAlign.CENTER,
-            }));
-        }
+        this._tomatoes.destroy_all_children();
+        const available = this._availableRowWidth();
+
+        for (const slot of progress.slots)
+            this._tomatoes.add_child(this._tomato(slot));
+
+        const [, rowWidth] = this._tomatoes.get_preferred_width(-1);
+        if (rowFits(rowWidth, available))
+            return;
+
+        this._tomatoes.destroy_all_children();
+        this._tomatoes.add_child(this._count(progress.label));
+    }
+
+    /**
+     * The width the row may use: the popup's own, with the padding and the
+     * border the row cannot draw into taken off. Measured rather than read off
+     * the stylesheet, so another `min-width`, another ring or another font is
+     * accounted for by being there.
+     */
+    _availableRowWidth() {
+        const [, width] = this.box.get_preferred_width(-1);
+        const node = this.box.get_theme_node();
+        const used = [St.Side.LEFT, St.Side.RIGHT].reduce((total, side) =>
+            total + node.get_padding(side) + node.get_border_width(side), 0);
+
+        return width - used;
+    }
+
+    _count(label) {
+        return new St.Label({
+            text: label,
+            style_class: 'gnomato-tomatoes-label',
+        });
+    }
+
+    _tomato(slot) {
+        const classes = ['gnomato-tomato'];
+        if (slot.filled)
+            classes.push('gnomato-tomato--filled');
+        if (slot.current)
+            classes.push('gnomato-tomato--current');
+        return new St.Widget({
+            style_class: classes.join(' '),
+            y_align: Clutter.ActorAlign.CENTER,
+        });
     }
 
     _setEnabled(button, enabled) {

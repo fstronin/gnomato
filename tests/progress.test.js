@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 import {defineTests, deepEqual, equal} from './harness.js';
-import {ringFraction, setProgress} from '../lib/progress.js';
+import {ringFraction, rowFits, setProgress} from '../lib/progress.js';
 import {Kind} from '../lib/schedule.js';
 
 const slots = (...states) => states.map(([filled, current]) => ({filled, current}));
@@ -28,7 +28,6 @@ export const tests = defineTests(test => {
 
     test('a set before any pomodoro highlights the first slot', () =>
         deepEqual(setProgress(0, 4, Kind.POMODORO), {
-            compact: false,
             label: '0/4',
             slots: slots([false, true], [false, false], [false, false], [false, false]),
         }));
@@ -55,24 +54,40 @@ export const tests = defineTests(test => {
 
     test('a slot beyond the set fills the row and highlights nothing', () => {
         deepEqual(setProgress(5, 4, Kind.POMODORO), {
-            compact: false,
             label: '4/4',
             slots: slots([true, false], [true, false], [true, false], [true, false]),
         });
     });
 
-    test('a set of six still shows the row', () => {
-        const progress = setProgress(0, 6, Kind.POMODORO);
-        equal(progress.compact, false);
-        equal(progress.slots.length, 6);
-    });
-
-    test('a set larger than six collapses to a count', () => {
+    test('a set wider than the popup still describes every slot', () => {
         const progress = setProgress(2, 12, Kind.POMODORO);
-        equal(progress.compact, true);
         equal(progress.label, '2/12');
         equal(progress.slots.length, 12);
     });
+
+    test('a row as wide as the popup fits it', () => {
+        equal(rowFits(280, 280), true);
+        equal(rowFits(232, 280), true);
+    });
+
+    test('a row wider than the popup does not fit it', () =>
+        equal(rowFits(292, 280), false));
+
+    test('nothing fits into no width at all', () => {
+        equal(rowFits(0, 0), false);
+        equal(rowFits(232, 0), false);
+        equal(rowFits(232, -38), false);
+    });
+
+    test('a width that cannot be measured does not fit a row', () => {
+        equal(rowFits(NaN, 280), false);
+        equal(rowFits(232, NaN), false);
+        equal(rowFits(undefined, 280), false);
+        equal(rowFits(232, undefined), false);
+    });
+
+    test('a set with no slots asks for no width and is placed', () =>
+        equal(rowFits(0, 280), true));
 
     test('a set without slots does not break the row', () =>
         deepEqual(setProgress(0, 0, Kind.POMODORO).slots, []));
