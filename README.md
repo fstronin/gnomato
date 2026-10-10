@@ -80,9 +80,17 @@ The screenshots are of the real extension, at the sizes the shell draws it.
 ## Install
 
 ```sh
-./build-deb.sh
-sudo dpkg -i dist/gnomato_0.2.0_all.deb
+./build-deb.sh                                    # the version comes from debian/changelog
+sudo dpkg -i dist/gnomato_0.4.0_all.deb           # pkexec does the same where sudo wants a password
 gnome-extensions enable gnomato@fstronin.github.io
+```
+
+A development copy in `~/.local/share/gnome-shell/extensions/` shadows the
+package — the shell logs "already installed in user dir … will not be loaded"
+and runs that copy instead — so remove it first:
+
+```sh
+rm -rf ~/.local/share/gnome-shell/extensions/gnomato@fstronin.github.io
 ```
 
 On Wayland a new extension is only picked up by a freshly started shell, so log
@@ -99,8 +107,9 @@ gnome-extensions prefs gnomato@fstronin.github.io
 ```
 
 The package installs to
-`/usr/share/gnome-shell/extensions/gnomato@fstronin.github.io/`, compiles the GSettings
-schema into that directory at build time and needs no post-install step.
+`/usr/share/gnome-shell/extensions/gnomato@fstronin.github.io/`, compiles the
+GSettings schema into that directory at build time and needs no post-install
+step: the cue sounds and the compiled translations travel inside it.
 
 ## Journal
 
