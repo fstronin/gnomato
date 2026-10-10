@@ -13,26 +13,17 @@ import {shouldAutoStart, isBreak} from './lib/schedule.js';
 import {fromSettingsValues} from './lib/state.js';
 import {dayKey, makeCountResetRecord, makeRecords, todayCount} from './lib/journal.js';
 import {appendRecords, journalPath, readRecords} from './lib/journalfile.js';
+import {cueFile} from './lib/cues.js';
 import {GnomatoIndicator} from './ui/indicator.js';
 
 const INTERVAL_KEYS = ['pomodoro-seconds', 'short-break-seconds', 'long-break-seconds'];
 
-/**
- * The cue is the sound of the Interval that is beginning: a pomodoro gets the
- * alarm that calls you back to work, a break the chime that lets you go. Every
- * completion announces the cue of the Interval it advances to, so the two kinds
- * can never be confused for one another. Only a completion sounds it: an
- * Interval the user starts themselves is announced by nobody.
- */
-const CUE_FOR = {
-    [Kind.POMODORO]: 'alarm-clock-elapsed',
-    [Kind.SHORT_BREAK]: 'complete',
-    [Kind.LONG_BREAK]: 'complete',
-};
-
 export default class GnomatoExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
+        // The system's own switch for event sounds: Mutter applies it to theme
+        // sounds alone, and the cues are files, so the switch is ours to read.
+        this._systemSound = Gio.Settings.new('org.gnome.desktop.sound');
         this._tickId = 0;
         this._signalIds = [];
 
@@ -73,6 +64,7 @@ export default class GnomatoExtension extends Extension {
             this._syncUI();
         }));
 
+        this._warnAboutMissingCues();
         this._syncUI();
         this._syncTickSource();
         this._refreshTodayCount();
@@ -103,6 +95,7 @@ export default class GnomatoExtension extends Extension {
         // settings object: flushing the pending writes is a global operation.
         Gio.Settings.sync();
         this._settings = null;
+        this._systemSound = null;
         this._timer = null;
     }
 
@@ -266,16 +259,36 @@ export default class GnomatoExtension extends Extension {
 
     /**
      * The Cue of the Interval that is beginning, sounded only at a completion.
-     * It comes from the sound theme; the system event-sound switch is applied
-     * inside Mutter, which hands the request to libcanberra. That call is
-     * fire-and-forget — it has no error path, so a refusal is silent.
+     * It is the extension's own file (see lib/cues.js), played through the
+     * session's sound player: fire-and-forget — the call has no error path, so a
+     * refusal is silent. Two switches silence it, the extension's own and the
+     * system's event sounds, which Mutter applies to theme sounds alone.
      */
     _playCue(kind) {
         if (!this._settings.get_boolean('sound-enabled'))
             return;
+        if (!this._systemSound.get_boolean('event-sounds'))
+            return;
 
-        global.display.get_sound_player().play_from_theme(
-            CUE_FOR[kind], _('Pomodoro timer'), null);
+        const path = GLib.build_filenamev([this.dir.get_path(), cueFile(kind)]);
+        global.display.get_sound_player().play_from_file(
+            Gio.File.new_for_path(path), _('Pomodoro timer'), null);
+    }
+
+    /**
+     * A cue that is not there plays nothing and says nothing: the sound player
+     * has no error path, so a bundle that missed `sounds/` — the one mistake
+     * this project has already shipped once — would fall silent in silence. The
+     * check is a log line, never a refusal: the timer works without its cues.
+     */
+    _warnAboutMissingCues() {
+        const paths = new Set(Object.values(Kind).map(kind =>
+            GLib.build_filenamev([this.dir.get_path(), cueFile(kind)])));
+
+        for (const path of paths) {
+            if (!Gio.File.new_for_path(path).query_exists(null))
+                console.warn(`gnomato: cue sound missing: ${path}`);
+        }
     }
 
     _shouldAutoStart() {

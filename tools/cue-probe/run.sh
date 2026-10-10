@@ -1,11 +1,12 @@
 #!/bin/bash
 # Checks the cue the extension plays: the only thing that sounds one is a
-# completion, which announces the cue of the interval it advances to, while
+# completion, which announces the cue file of the interval it advances to, while
 # every start the user makes by hand is silent. A headless gnome-shell runs the
 # real code, tools/cue-probe/probe patches the sound player and drives the
-# extension through two completions (a pomodoro and a break), the hand starts,
-# a pause, a resume and a skip in between, and the sound switch — recording
-# every event id that reaches the player.
+# extension through completions (a pomodoro and a break), the hand starts,
+# a pause, a resume and a skip in between, and both sound switches — the
+# extension's own and the system's event sounds — recording every cue file that
+# reaches the player.
 #
 #   ./run.sh                          the working tree
 #   SRC=/path/to/copy ./run.sh        an installed copy — the unpacked upload,
@@ -17,9 +18,9 @@
 #   VM       virtual monitor mode            (default 1280x800)
 #   TIMEOUT  seconds the throwaway shell may live (default 300)
 #
-# There is no audio server in the throwaway session, so this proves which ids are
-# requested and never how they sound — the difference between the two sounds is
-# for a human ear in a real session. The real session is never touched (private
+# There is no audio server in the throwaway session, so this proves which cue
+# files are requested and never how they sound — the difference between the two
+# sounds is for a human ear in a real session. The real session is never touched (private
 # XDG_RUNTIME_DIR, private settings backend); everything the shell leaves behind
 # stays in ROOT. Needs rsync and python3.
 set -u
@@ -104,7 +105,9 @@ except OSError as e:
 print(report['error'] or report['verdict'])
 for check in report['checks']:
     print('ok  ' if check['pass'] else 'FAIL', check['name'], check['detail'] or '')
-print('cues:', [(c['step'], c.get('eventId') or c.get('file')) for c in report['cues']])
+def short(path):
+    return '/'.join(path.split('/')[-2:]) if path else path
+print('cues:', [(c['step'], short(c.get('file'))) for c in report['cues']])
 sys.exit(1 if report['error'] or any(not c['pass'] for c in report['checks']) else 0)
 PY
 status=$?

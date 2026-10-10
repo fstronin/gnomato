@@ -15,6 +15,13 @@ gnomato (0.4.0) unstable; urgency=medium
     at 280 px of content width fourteen tomatoes fit, and a set is capped at
     twelve.
 
+  * The cues are the extension's own sounds now: two short WAVs under sounds/,
+    made by tools/sounds/make-sounds.py — the pomodoro rises, the break falls,
+    both break kinds share one sound — played as files, because no sound-theme
+    event read as "the break begins" rather than as a notification. The
+    system's event-sound switch is now read by the extension itself, since
+    Mutter applies it to theme sounds alone.
+
  -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Sat, 10 Oct 2026 13:55:52 +0200
 
 gnomato (0.3.0) unstable; urgency=medium

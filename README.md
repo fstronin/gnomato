@@ -26,7 +26,7 @@ marked `restored` in the journal. See
 | Popup | Left click: a countdown ring, the interval in words, the set as a row of tomatoes (a count instead, when the row would not fit), and start/pause, skip and reset as round buttons |
 | Menu | Right click: today's finished pomodoros, the way to reset that count, and Preferences |
 | Intervals | Configurable pomodoro and break lengths, a set of N pomodoros ending in a long break |
-| Behaviour | Breaks start themselves, pomodoros do not; a finished interval ends with a banner and announces the next one with its own cue (an alarm for a pomodoro, a chime for a break), while an interval you start by hand is silent |
+| Behaviour | Breaks start themselves, pomodoros do not; a finished interval ends with a banner and announces the next one with its own cue — a rising pair for a pomodoro, a falling one for a break, both made by `tools/sounds/make-sounds.py` — while an interval you start by hand is silent |
 | Journal | Append-only JSONL of finished, skipped and interrupted intervals, and of count resets |
 | Keys | Optional global shortcuts, unassigned by default |
 
@@ -114,11 +114,14 @@ roughly a hundred bytes per interval, and deleting it only loses history. Point
 ## Development
 
 The extension directory *is* the repository root: `metadata.json`,
-`extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `schemas/`.
+`extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `sounds/`,
+`schemas/`.
 
 ```sh
 glib-compile-schemas schemas/            # after editing the schema
 gjs -m tests/run-tests.js                # unit tests for lib/, no shell needed
+python3 tools/sounds/make-sounds.py      # rewrite the cue sounds from their motifs
+python3 tools/sounds/make-sounds.py --check  # fail when they are not what the motifs render
 ```
 
 Install the working tree for the current user — only the extension itself
@@ -137,8 +140,8 @@ gnome-extensions enable gnomato@fstronin.github.io
 ```
 
 What lands there is the extension payload and `LICENSE`: `metadata.json`,
-`extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `schemas/`,
-`LICENSE`.
+`extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `sounds/`,
+`schemas/`, `LICENSE`.
 
 Then, in order of how much they change:
 
@@ -154,7 +157,8 @@ Two things to know about this machine specifically:
 
 - `gnome-extensions pack` takes only `metadata.json`, `extension.js`, `prefs.js`,
   `stylesheet.css`, `schemas/` and `locale/` by default, so the bundle is missing
-  `lib/` and `ui/` unless they are named: `--extra-source=lib --extra-source=ui`.
+  `lib/` and `ui/` unless they are named: `--extra-source=lib --extra-source=ui`
+  (and `--extra-source=sounds`, or the cues ship silent).
   Such a bundle looks complete and fails to import inside the shell. The upload
   we ship is built this way — see `docs/PUBLISHING.md`.
 - The same uuid in `~/.local/share/gnome-shell/extensions/` and

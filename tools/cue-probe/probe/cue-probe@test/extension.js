@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Throwaway extension for tools/cue-probe. It patches the sound player, drives
 // the extension under test through interval boundaries and writes a report of
-// every cue id that reached the player, with its own checks. It is not part of
+// every cue file that reached the player, with its own checks. It is not part of
 // the package and lives in the throwaway shell only.
 //
 // The interval lengths stay inside the schema range (60 s), so completions are
@@ -9,6 +9,7 @@
 // itself is the timer's business and is covered by the unit tests.
 
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -26,6 +27,7 @@ export default class CueProbeExtension extends Extension {
         this._checks = [];
         this._silenceBaseline = 0;
         this._step = 'boot';
+        this._systemSound = Gio.Settings.new('org.gnome.desktop.sound');
         this._patchSoundPlayer();
         GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             // The shell enables extensions a moment after it is up.
@@ -97,6 +99,7 @@ export default class CueProbeExtension extends Extension {
         settings.set_boolean('auto-start-work', false);
         settings.set_int('pomodoro-seconds', 60);
         settings.set_int('short-break-seconds', 60);
+        this._systemSound.set_boolean('event-sounds', true);
 
         this._snapshot('settings applied');
         this._check('the schema accepted the settings used here',
@@ -117,16 +120,19 @@ export default class CueProbeExtension extends Extension {
             ['arm the pomodoro deadline', 300, () => this._expire()],
             ['the pomodoro completes', 1700, () => {
                 this._snapshot('after the pomodoro');
-                this._check('the completion cues the incoming break',
-                    () => this._lastCue() === 'complete');
+                this._check('the completion plays the incoming break cue file',
+                    () => this._lastBase() === 'break.wav', `played ${this._lastBase()}`);
+                this._check('the incoming break cue lives under the extension sounds directory',
+                    () => this._pathIsCueFile(this._lastFile()),
+                    `path ${this._lastFile()}`);
                 this._check('the break auto-started',
                     () => this._ext._timer.state === 'RUNNING' && this._ext._timer.kind === 'SHORT_BREAK');
             }],
             ['arm the break deadline', 300, () => this._expire()],
             ['the break completes', 1700, () => {
                 this._snapshot('after the break');
-                this._check('the completion cues the incoming pomodoro',
-                    () => this._lastCue() === 'alarm-clock-elapsed');
+                this._check('the completion plays the incoming pomodoro cue file',
+                    () => this._lastBase() === 'pomodoro.wav', `played ${this._lastBase()}`);
                 this._check('the pomodoro did not auto-start, so the timer is idle on it',
                     () => this._ext._timer.state === 'IDLE' && this._ext._timer.kind === 'POMODORO');
             }],
@@ -166,32 +172,74 @@ export default class CueProbeExtension extends Extension {
                 this._check('a hand-started break stays silent',
                     () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
             }],
-            ['arm the silenced break deadline', 300, () => {
+            ['arm the extension-silenced break deadline', 300, () => {
                 this._silenceBaseline = this._cues.length;
                 this._ext._settings.set_boolean('sound-enabled', false);
                 this._expire();
             }],
-            ['the sound switch silences a completion', 1700, () => {
-                this._snapshot('completed with the sound off');
-                this._check('the sound switch silenced the completion',
+            ['the extension sound switch silences a completion', 1700, () => {
+                this._snapshot('completed with the extension sound off');
+                this._check('the extension sound switch silenced the completion',
                     () => this._cues.length === this._silenceBaseline,
                     `${this._silenceBaseline} -> ${this._cues.length} cues`);
                 this._check('the pomodoro is idle after the silenced completion',
                     () => this._ext._timer.state === 'IDLE' && this._ext._timer.kind === 'POMODORO');
             }],
-            ['the sound switch back on', 300, () => {
+            ['the extension sound switch back on', 300, () => {
                 this._ext._settings.set_boolean('sound-enabled', true);
                 const before = this._cues.length;
                 this._ext._toggle();
-                this._snapshot('pomodoro started with the sound back on');
+                this._snapshot('pomodoro started with the extension sound back on');
                 this._check('a hand-started pomodoro stays silent after the switch',
                     () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
             }],
             ['arm the last pomodoro deadline', 300, () => this._expire()],
-            ['the pomodoro completes with the sound back on', 1700, () => {
-                this._snapshot('after the last completion');
-                this._check('the completion sounds again once the switch is back on',
-                    () => this._lastCue() === 'complete');
+            ['the pomodoro completes with the extension sound back on', 1700, () => {
+                this._snapshot('after the completion with the extension sound back on');
+                this._check('the completion sounds again once the extension switch is back on',
+                    () => this._lastBase() === 'break.wav', `played ${this._lastBase()}`);
+            }],
+            ['arm the system-silenced break deadline', 300, () => {
+                this._silenceBaseline = this._cues.length;
+                this._systemSound.set_boolean('event-sounds', false);
+                this._expire();
+            }],
+            ['the system event-sounds switch silences a completion', 1700, () => {
+                this._snapshot('completed with the system event sounds off');
+                this._check('the system event-sounds switch silenced the completion',
+                    () => this._cues.length === this._silenceBaseline,
+                    `${this._silenceBaseline} -> ${this._cues.length} cues`);
+                this._check('the pomodoro is idle after the system-silenced completion',
+                    () => this._ext._timer.state === 'IDLE' && this._ext._timer.kind === 'POMODORO');
+                this._check('the system event-sounds switch is off',
+                    () => this._systemSound.get_boolean('event-sounds') === false,
+                    `event-sounds=${this._systemSound.get_boolean('event-sounds')}`);
+            }],
+            ['the system event-sounds switch back on', 300, () => {
+                this._systemSound.set_boolean('event-sounds', true);
+                const before = this._cues.length;
+                this._ext._toggle();
+                this._snapshot('pomodoro started with the system sound back on');
+                this._check('a hand-started pomodoro stays silent after the system switch',
+                    () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
+                this._check('the system event-sounds switch is back on',
+                    () => this._systemSound.get_boolean('event-sounds') === true,
+                    `event-sounds=${this._systemSound.get_boolean('event-sounds')}`);
+            }],
+            ['arm the final pomodoro deadline', 300, () => this._expire()],
+            ['the pomodoro completes with the system sound back on', 1700, () => {
+                this._snapshot('after the completion with the system sound back on');
+                this._check('the completion sounds again once the system switch is back on',
+                    () => this._lastBase() === 'break.wav', `played ${this._lastBase()}`);
+            }],
+            ['the cue files are the only cues ever played', 300, () => {
+                const themeCalls = this._cues.filter(cue => cue.eventId !== undefined).length;
+                this._check('the extension never plays a theme event',
+                    () => themeCalls === 0, `${themeCalls} play_from_theme calls`);
+                this._check('every cue played is an extension sounds file',
+                    () => this._cues.length > 0 &&
+                        this._cues.every(cue => this._pathIsCueFile(cue.file)),
+                    this._cues.map(cue => cue.file).join(', '));
             }],
         ];
         this._next();
@@ -223,8 +271,24 @@ export default class CueProbeExtension extends Extension {
         });
     }
 
-    _lastCue() {
-        return this._cues.length === 0 ? null : this._cues[this._cues.length - 1].eventId;
+    _lastFile() {
+        return this._cues.length === 0 ? null : this._cues[this._cues.length - 1].file ?? null;
+    }
+
+    _lastBase() {
+        const file = this._lastFile();
+        return file === null ? null : file.split('/').pop();
+    }
+
+    /** True only for a path inside the extension's own directory, at sounds/<name>.wav. */
+    _pathIsCueFile(path) {
+        if (typeof path !== 'string')
+            return false;
+        const dir = this._ext.dir.get_path();
+        const prefix = `${dir}/`;
+        if (!path.startsWith(prefix))
+            return false;
+        return /^sounds\/(pomodoro|break)\.wav$/.test(path.slice(prefix.length));
     }
 
     _check(name, predicate, detail = null) {

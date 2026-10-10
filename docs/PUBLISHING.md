@@ -26,14 +26,16 @@ stays a local convenience for machines we control.
 
 ```sh
 gnome-extensions pack --force --out-dir dist \
-    --extra-source=lib --extra-source=ui --extra-source=LICENSE .
+    --extra-source=lib --extra-source=ui --extra-source=sounds \
+    --extra-source=LICENSE .
 ```
 
 `gnome-extensions pack` picks up only `metadata.json`, `extension.js`,
 `prefs.js`, `stylesheet.css`, `schemas/` and `locale/`. Everything the extension
-imports has to be named: without `--extra-source=lib --extra-source=ui` the zip
-is missing both directories and the extension fails at import time. This is the
-one build step that silently produces a broken upload.
+imports or plays has to be named: without `--extra-source=lib --extra-source=ui`
+the zip is missing both directories and the extension fails at import time, and
+without `--extra-source=sounds` it ships silent cues. This is the one build step
+that silently produces a broken upload.
 
 The result is `dist/<uuid>.shell-extension.zip`. `dist/` and `*.zip` are
 gitignored — the bundle is an artifact, not a source file.
@@ -43,6 +45,8 @@ What belongs inside:
 - `schemas/<schema-id>.gschema.xml` — required by review, and
   `gnome-extensions install` compiles it into `gschemas.compiled` itself.
   Do not ship the compiled file.
+- `sounds/*.wav` — the two cue sounds the extension plays; without them the
+  cues are silent, and nothing reports it.
 - `LICENSE`.
 
 What stays out: `docs/images/` (the icon and screenshots are uploaded on the
@@ -85,7 +89,7 @@ Before uploading, re-read
 [the review guidelines](https://gjs.guide/extensions/review-guidelines/review-guidelines.html).
 The rules this code already follows, so a change does not quietly break review:
 
-- nothing is created at module scope except plain data (`CUE_FOR`,
+- nothing is created at module scope except plain data (`CUE_FILES`,
   `INTERVAL_KEYS`, `Kind`), and everything created in `enable()` is destroyed in
   `disable()` — sources, signal handlers, keybindings, the indicator;
 - `extension.js` imports no Gtk/Adw, `prefs.js` imports no Clutter/Meta/St/Shell;
@@ -103,5 +107,6 @@ One commit per release, four files in step:
    source of the package version).
 2. `metadata.json` — `version-name` matches that version.
 3. `docs/images/` — regenerate with `tools/screenshots/run.sh` if the UI changed.
-4. `tools/cue-probe/run.sh` and `gjs -m tests/run-tests.js` green, then pack,
-   verify the bundle, upload, tag.
+4. `tools/cue-probe/run.sh`, `gjs -m tests/run-tests.js` and
+   `python3 tools/sounds/make-sounds.py --check` green, then pack, verify the
+   bundle, upload, tag.
