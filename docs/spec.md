@@ -21,7 +21,8 @@
 | Dev-loop | подкоманды `reload` нет; модуль ESM кэшируется, поэтому правка `extension.js` требует повторного входа в сессию; `enable`/`disable` перезапускают только `enable()`/`disable()` и перечитывают `stylesheet.css`, поэтому правки вида не требуют новой сессии |
 | Тестовый харнесс | `gjs -m file.js` работает: относительные ESM-импорты и `gi://GLib`/`gi://Gio` доступны вне shell; `import system from 'system'` даёт `system.exit(code)` |
 | Пути состояния | `GLib.get_user_state_dir()` → `/home/fstronin/.local/state` |
-| Отсутствует | `gnome-extensions-app`, `flatpak`-приложения; **`gettext`** (msgfmt/xgettext) на этой машине не установлен, но без него не собрать ни `locale/`, ни zip с переводами — `sudo apt install gettext` |
+| Отсутствует | `gnome-extensions-app`, `flatpak`-приложения |
+| Переводы | `gettext` 0.23.2-1 поставлен (`pkexec apt-get install gettext`): `msgfmt`, `xgettext`, `msgmerge` в `/usr/bin` — без них не собрать ни `locale/`, ни zip, ни deb |
 
 ## Решения
 
