@@ -43,23 +43,37 @@ Ending the current Interval early and moving on to the next one; unlike Pause,
 the Interval is not resumed.
 _Avoid_: stop, cancel, abort, «пропустить перерыв»
 
+**Reset**:
+Rewinding the current Interval: it is cut short and begins again at its full
+length, and the Slot it holds in the Set does not move. Unlike a Count Reset, it
+is about the Interval and not about the day's count.
+_Avoid_: restart, «перезапуск»
+
 **Journal**:
 The accumulating record of past Intervals: what ran, how long it lasted, how it
-ended.
+ended. It carries the Count Resets too, since "today: N" is a reading of it.
 _Avoid_: history, log, statistics
 
 **Today**:
 The local day, midnight to midnight; the unit "today: N" is counted in. An
-Interval crossing midnight is split into two records.
+Interval crossing midnight is split into two records and counts on the day it
+started. A Count Reset moves where the count starts, never where the day does.
 _Avoid_: «день», «календарный день»
+
+**Count Reset**:
+Restarting the day's count at the moment the user asks for it: the Pomodoros
+already counted stop counting, and the count begins again with the next one. It
+is a mark in the Journal, not a deletion — the Intervals stay in the record.
+_Avoid_: reset, clear, zero, «обнулить счёт»
 
 ## How an Interval begins
 
 **Cue**:
 The sound that marks an Interval beginning: the Pomodoro cue when a Pomodoro
-begins, the Break cue when a Break begins. The two are different sounds, and a
-completion announces the incoming Interval's Cue as the Interval ends, so the
-Cue sounds even when the next Interval does not start itself.
+begins, the Break cue when a Break begins. The two are different sounds. Only a
+completion sounds one — it announces the Cue of the Interval it advances to, so
+the Cue is heard even when that Interval does not start itself — and an Interval
+the user starts by hand is silent.
 _Avoid_: sound, signal, «звонок»
 
 ## How an Interval ends

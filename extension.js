@@ -11,7 +11,7 @@ import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/ex
 import {Kind, State, Timer} from './lib/timer.js';
 import {shouldAutoStart, isBreak} from './lib/schedule.js';
 import {fromSettingsValues} from './lib/state.js';
-import {dayKey, makeRecords, todayCount} from './lib/journal.js';
+import {dayKey, makeCountResetRecord, makeRecords, todayCount} from './lib/journal.js';
 import {appendRecords, journalPath, readRecords} from './lib/journalfile.js';
 import {GnomatoIndicator} from './ui/indicator.js';
 
@@ -21,7 +21,8 @@ const INTERVAL_KEYS = ['pomodoro-seconds', 'short-break-seconds', 'long-break-se
  * The cue is the sound of the Interval that is beginning: a pomodoro gets the
  * alarm that calls you back to work, a break the chime that lets you go. Every
  * completion announces the cue of the Interval it advances to, so the two kinds
- * can never be confused for one another.
+ * can never be confused for one another. Only a completion sounds it: an
+ * Interval the user starts themselves is announced by nobody.
  */
 const CUE_FOR = {
     [Kind.POMODORO]: 'alarm-clock-elapsed',
@@ -34,9 +35,6 @@ export default class GnomatoExtension extends Extension {
         this._settings = this.getSettings();
         this._tickId = 0;
         this._signalIds = [];
-        // Whether the pending Interval's cue has already sounded at its
-        // boundary; the Start that begins it then stays quiet.
-        this._cueAnnounced = false;
 
         this._timer = new Timer({
             durations: this._durations(),
@@ -49,6 +47,10 @@ export default class GnomatoExtension extends Extension {
             onToggle: () => this._toggle(),
             onSkip: () => this._skip(),
             onReset: () => this._reset(),
+            onResetCount: () => this._resetCount(),
+            // The day's count is shown in this menu alone, so it is read when
+            // the menu opens: nothing else has to keep it fresh.
+            onRightMenuOpen: () => this._refreshTodayCount(),
             onPreferences: () => this.openPreferences(),
         });
         Main.panel.addToStatusArea(this.uuid, this._indicator);
@@ -101,7 +103,6 @@ export default class GnomatoExtension extends Extension {
         // settings object: flushing the pending writes is a global operation.
         Gio.Settings.sync();
         this._settings = null;
-        this._cueAnnounced = false;
         this._timer = null;
     }
 
@@ -139,31 +140,34 @@ export default class GnomatoExtension extends Extension {
             this._timer.pause();
         else if (this._timer.state === State.PAUSED)
             this._timer.resume();
-        else {
+        else
+            // Silent on purpose: the Cue of an Interval is announced by the
+            // completion that came before it, never by the hand that begins it.
             this._timer.start();
-            // A completion announced this very Interval as it ended; beginning
-            // it now must not sound the same cue a second time.
-            if (this._cueAnnounced)
-                this._cueAnnounced = false;
-            else
-                this._playCue(this._timer.kind);
-        }
         this._afterTransition();
     }
 
     _skip() {
         this._writeRecords(this._timer.skip());
-        // The Interval that follows was never announced, so its cue has to
-        // sound when it begins.
-        this._cueAnnounced = false;
         this._afterTransition();
     }
 
     _reset() {
         this._writeRecords(this._timer.reset());
-        // Rewound: the same Interval begins again, and it is unannounced.
-        this._cueAnnounced = false;
         this._afterTransition();
+    }
+
+    /**
+     * The day's count restarts where the user says it does: the mark goes into
+     * the journal, and the count is a reading of that one file again. A mark
+     * that cannot be written changes nothing — a reset nobody can see in the
+     * record would be worse than no reset at all.
+     */
+    _resetCount() {
+        const nowMs = Math.floor(GLib.get_real_time() / 1000);
+        if (!appendRecords(journalPath(), [makeCountResetRecord(nowMs)]))
+            return;
+        this._refreshTodayCount();
     }
 
     /**
@@ -257,23 +261,21 @@ export default class GnomatoExtension extends Extension {
         // The completed Interval has already advanced to the next one, and the
         // cue belongs to that Interval: it sounds here even when nothing
         // auto-starts, since the user is being told what comes next.
-        this._cueAnnounced = this._playCue(this._timer.kind) !== null;
+        this._playCue(this._timer.kind);
     }
 
     /**
-     * The Cue of the Interval that is beginning, or null when sound is off.
+     * The Cue of the Interval that is beginning, sounded only at a completion.
      * It comes from the sound theme; the system event-sound switch is applied
      * inside Mutter, which hands the request to libcanberra. That call is
-     * fire-and-forget — it has no error path, so a refusal is silent — and the
-     * id is returned for the headless harness, which has no audio server.
+     * fire-and-forget — it has no error path, so a refusal is silent.
      */
     _playCue(kind) {
         if (!this._settings.get_boolean('sound-enabled'))
-            return null;
+            return;
 
-        const eventId = CUE_FOR[kind];
-        global.display.get_sound_player().play_from_theme(eventId, _('Pomodoro timer'), null);
-        return eventId;
+        global.display.get_sound_player().play_from_theme(
+            CUE_FOR[kind], _('Pomodoro timer'), null);
     }
 
     _shouldAutoStart() {

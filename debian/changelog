@@ -1,3 +1,16 @@
+gnomato (0.4.0) unstable; urgency=medium
+
+  * The day's count can be reset by hand from the right-click menu. The reset is
+    a mark in the journal rather than a deletion, so "Today" stays a reading of
+    the record and a new local day still starts it at zero. The count is also
+    read when the menu opens, not only when an interval closes, so it cannot sit
+    stale across midnight.
+  * Only a completion sounds a cue now. Starting an interval by hand — the popup
+    button or the shortcut — is silent: the cue is what announces the interval
+    the completion advanced to.
+
+ -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Sat, 10 Oct 2026 13:55:52 +0200
+
 gnomato (0.3.0) unstable; urgency=medium
 
   * Sound cues per interval kind: a pomodoro begins with an alarm and a break

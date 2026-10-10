@@ -24,6 +24,7 @@ export default class CueProbeExtension extends Extension {
         this._cues = [];
         this._snapshots = [];
         this._checks = [];
+        this._silenceBaseline = 0;
         this._step = 'boot';
         this._patchSoundPlayer();
         GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
@@ -105,20 +106,21 @@ export default class CueProbeExtension extends Extension {
 
         this._queue = [
             ['start the pomodoro by hand', 0, () => {
+                const before = this._cues.length;
                 this._ext._toggle();
                 this._snapshot('pomodoro started');
-                this._check('a pomodoro beginning gets its own cue',
-                    () => this._lastCue() === 'alarm-clock-elapsed');
+                this._check('a hand-started pomodoro stays silent',
+                    () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
+                this._check('the pomodoro is running',
+                    () => this._ext._timer.state === 'RUNNING' && this._ext._timer.kind === 'POMODORO');
             }],
             ['arm the pomodoro deadline', 300, () => this._expire()],
             ['the pomodoro completes', 1700, () => {
                 this._snapshot('after the pomodoro');
-                this._check('the completion cues the incoming break with the other cue',
+                this._check('the completion cues the incoming break',
                     () => this._lastCue() === 'complete');
                 this._check('the break auto-started',
                     () => this._ext._timer.state === 'RUNNING' && this._ext._timer.kind === 'SHORT_BREAK');
-                this._check('the auto-started break is marked announced',
-                    () => this._ext._cueAnnounced === true);
             }],
             ['arm the break deadline', 300, () => this._expire()],
             ['the break completes', 1700, () => {
@@ -127,17 +129,13 @@ export default class CueProbeExtension extends Extension {
                     () => this._lastCue() === 'alarm-clock-elapsed');
                 this._check('the pomodoro did not auto-start, so the timer is idle on it',
                     () => this._ext._timer.state === 'IDLE' && this._ext._timer.kind === 'POMODORO');
-                this._check('the announced flag is set for the pending pomodoro',
-                    () => this._ext._cueAnnounced === true);
             }],
             ['start that very pomodoro by hand', 300, () => {
                 const before = this._cues.length;
                 this._ext._toggle();
-                this._snapshot('pomodoro started after the announcement');
-                this._check('a start of the just-announced interval stays silent',
+                this._snapshot('pomodoro started after the completion');
+                this._check('a hand-started pomodoro stays silent',
                     () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
-                this._check('the announcement is consumed',
-                    () => this._ext._cueAnnounced === false);
             }],
             ['pause it', 300, () => {
                 const before = this._cues.length;
@@ -160,25 +158,40 @@ export default class CueProbeExtension extends Extension {
                 this._check('a skip is silent', () => this._cues.length === before);
                 this._check('the skip advanced to a break',
                     () => this._ext._timer.state === 'IDLE' && this._ext._timer.kind === 'SHORT_BREAK');
-                this._check('the skip cleared the announcement',
-                    () => this._ext._cueAnnounced === false);
             }],
             ['start that break by hand', 300, () => {
+                const before = this._cues.length;
                 this._ext._toggle();
                 this._snapshot('break started');
-                this._check('a break beginning gets its own cue',
-                    () => this._lastCue() === 'complete');
-            }],
-            ['turn the sound off and start a pomodoro', 300, () => {
-                const before = this._cues.length;
-                this._ext._settings.set_boolean('sound-enabled', false);
-                this._ext._skip();
-                this._ext._toggle();
-                this._snapshot('started with the sound off');
-                this._check('the switch silences the cue',
+                this._check('a hand-started break stays silent',
                     () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
-                this._check('the pomodoro still started',
-                    () => this._ext._timer.state === 'RUNNING' && this._ext._timer.kind === 'POMODORO');
+            }],
+            ['arm the silenced break deadline', 300, () => {
+                this._silenceBaseline = this._cues.length;
+                this._ext._settings.set_boolean('sound-enabled', false);
+                this._expire();
+            }],
+            ['the sound switch silences a completion', 1700, () => {
+                this._snapshot('completed with the sound off');
+                this._check('the sound switch silenced the completion',
+                    () => this._cues.length === this._silenceBaseline,
+                    `${this._silenceBaseline} -> ${this._cues.length} cues`);
+                this._check('the pomodoro is idle after the silenced completion',
+                    () => this._ext._timer.state === 'IDLE' && this._ext._timer.kind === 'POMODORO');
+            }],
+            ['the sound switch back on', 300, () => {
+                this._ext._settings.set_boolean('sound-enabled', true);
+                const before = this._cues.length;
+                this._ext._toggle();
+                this._snapshot('pomodoro started with the sound back on');
+                this._check('a hand-started pomodoro stays silent after the switch',
+                    () => this._cues.length === before, `${before} -> ${this._cues.length} cues`);
+            }],
+            ['arm the last pomodoro deadline', 300, () => this._expire()],
+            ['the pomodoro completes with the sound back on', 1700, () => {
+                this._snapshot('after the last completion');
+                this._check('the completion sounds again once the switch is back on',
+                    () => this._lastCue() === 'complete');
             }],
         ];
         this._next();
@@ -232,7 +245,6 @@ export default class CueProbeExtension extends Extension {
             state: timer?.state ?? null,
             kind: timer?.kind ?? null,
             slot: timer?.slot ?? null,
-            announced: this._ext._cueAnnounced,
             cues: this._cues.length,
         });
     }

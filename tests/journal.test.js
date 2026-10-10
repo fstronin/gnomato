@@ -2,8 +2,8 @@
 
 import GLib from 'gi://GLib';
 
-import {defineTests, equal} from './harness.js';
-import {dayKey, makeRecords, todayCount} from '../lib/journal.js';
+import {defineTests, deepEqual, equal} from './harness.js';
+import {dayKey, makeCountResetRecord, makeRecords, todayCount} from '../lib/journal.js';
 
 const localMs = (y, mo, d, h, mi, s = 0) =>
     GLib.DateTime.new_local(y, mo, d, h, mi, s).to_unix() * 1000;
@@ -83,6 +83,49 @@ export const tests = defineTests(test => {
     test('records from another day are not counted', () => {
         const records = makeRecords(closed());
         equal(todayCount(records, '2026-10-07'), 0);
+    });
+
+    test('a count reset leaves a mark that is no interval', () => {
+        deepEqual(makeCountResetRecord(localMs(2026, 10, 8, 12, 0)),
+            {v: 1, mark: 'count-reset', at_ms: localMs(2026, 10, 8, 12, 0)});
+    });
+
+    test('the day starts over at the mark', () => {
+        const records = [
+            ...makeRecords(closed()),
+            makeCountResetRecord(localMs(2026, 10, 8, 12, 0)),
+        ];
+        equal(todayCount(records, '2026-10-08'), 0);
+    });
+
+    test('a pomodoro still counting when the count was reset comes into the new one', () => {
+        const start = localMs(2026, 10, 8, 11, 50);
+        const records = [
+            makeCountResetRecord(localMs(2026, 10, 8, 12, 0)),
+            ...makeRecords(closed({
+                startedWallMs: start,
+                endedWallMs: localMs(2026, 10, 8, 12, 15),
+                intervalId: start,
+            })),
+        ];
+        equal(todayCount(records, '2026-10-08'), 1);
+    });
+
+    test('the newest mark is the one the day restarts from', () => {
+        const records = [
+            makeCountResetRecord(localMs(2026, 10, 8, 9, 0)),
+            ...makeRecords(closed()),
+            makeCountResetRecord(localMs(2026, 10, 8, 12, 0)),
+        ];
+        equal(todayCount(records, '2026-10-08'), 0);
+    });
+
+    test("a mark from another day does not touch today's count", () => {
+        const records = [
+            makeCountResetRecord(localMs(2026, 10, 7, 12, 0)),
+            ...makeRecords(closed()),
+        ];
+        equal(todayCount(records, '2026-10-08'), 1);
     });
 
     test('dayKey follows local time', () => {

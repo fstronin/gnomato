@@ -19,7 +19,7 @@ const PAUSED_ICON_NAME = 'media-playback-pause-symbolic';
 /**
  * The panel button, with two surfaces: a popup on the left click that shows the
  * interval and drives it, and the ordinary menu on the right click, which keeps
- * the day's count and the way into the preferences.
+ * the day's count, the way to restart it and the way into the preferences.
  *
  * The panel row itself is unchanged: the icon is always there, the countdown
  * only while an interval runs, the pause mark while it is paused.
@@ -31,12 +31,16 @@ class GnomatoIndicator extends PanelMenu.Button {
      * @param {Function} callbacks.onToggle start, pause or resume
      * @param {Function} callbacks.onSkip finish the current interval early
      * @param {Function} callbacks.onReset rewind the current interval
+     * @param {Function} callbacks.onResetCount restart the day's count from now
+     * @param {Function} callbacks.onRightMenuOpen the day's menu is opening
      * @param {Function} callbacks.onPreferences open the preferences window
      */
-    _init({onToggle, onSkip, onReset, onPreferences}) {
+    _init({onToggle, onSkip, onReset, onResetCount, onRightMenuOpen, onPreferences}) {
         super._init(0.0, 'Gnomato', false);
 
         this._onPreferences = onPreferences;
+        this._onResetCount = onResetCount;
+        this._onRightMenuOpen = onRightMenuOpen;
 
         const box = new St.BoxLayout({style_class: 'panel-status-menu-box'});
         box.add_child(new St.Icon({
@@ -64,6 +68,9 @@ class GnomatoIndicator extends PanelMenu.Button {
         this._todayItem.reactive = false;
         this._todayItem.can_focus = false;
         this._rightMenu.addMenuItem(this._todayItem);
+        const resetCountItem = new PopupMenu.PopupMenuItem(_('Reset count'));
+        resetCountItem.connect('activate', () => this._onResetCount());
+        this._rightMenu.addMenuItem(resetCountItem);
         this._rightMenu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         const prefsItem = new PopupMenu.PopupMenuItem(_('Preferences'));
         prefsItem.connect('activate', () => this._onPreferences());
@@ -75,6 +82,14 @@ class GnomatoIndicator extends PanelMenu.Button {
         Main.uiGroup.add_child(this._rightMenu.actor);
         this._rightMenu.actor.hide();
         Main.panel.menuManager.addMenu(this._rightMenu);
+
+        // The count is a reading of the journal and this menu is the only place
+        // it is shown, so it is read when the menu opens: it cannot go stale
+        // across midnight while the shell sits idle.
+        this._rightMenu.connect('open-state-changed', (menu, open) => {
+            if (open)
+                this._onRightMenuOpen();
+        });
 
         // The built-in gesture of the button answers every mouse button, so the
         // surfaces cannot be told apart by adding a gesture: it is disarmed and

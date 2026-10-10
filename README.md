@@ -24,10 +24,10 @@ marked `restored` in the journal. See
 |---|---|
 | Panel | Countdown while an interval runs, a pause mark while it is paused, the icon alone when idle |
 | Popup | Left click: a countdown ring, the interval in words, the set as a row of tomatoes, and start/pause, skip and reset as round buttons |
-| Menu | Right click: today's finished pomodoros and Preferences |
+| Menu | Right click: today's finished pomodoros, the way to reset that count, and Preferences |
 | Intervals | Configurable pomodoro and break lengths, a set of N pomodoros ending in a long break |
-| Behaviour | Breaks start themselves, pomodoros do not; each interval begins with its own cue (an alarm for a pomodoro, a chime for a break) and ends with a banner |
-| Journal | Append-only JSONL of finished, skipped and interrupted intervals |
+| Behaviour | Breaks start themselves, pomodoros do not; a finished interval ends with a banner and announces the next one with its own cue (an alarm for a pomodoro, a chime for a break), while an interval you start by hand is silent |
+| Journal | Append-only JSONL of finished, skipped and interrupted intervals, and of count resets |
 | Keys | Optional global shortcuts, unassigned by default |
 
 ## Screenshots
@@ -53,7 +53,8 @@ it stopped, and the plan for the next interval while nothing is running.
 </p>
 
 A break wears its own colour and says which one it is; the long break ends the
-set with all four slots spent; the right click gives the day's count.
+set with all four slots spent; the right click gives the day's count and the way
+to reset it.
 
 <p align="center">
   <img src="docs/images/popup-break.png" width="280" alt="The popup during a short break">
@@ -104,10 +105,11 @@ schema into that directory at build time and needs no post-install step.
 
 Finished intervals are appended to `~/.local/state/gnomato/journal.jsonl`
 (one JSON object per line; an interval crossing local midnight is written
-twice, and only its first part counts as a pomodoro for that day). Nothing
-rotates the file: it grows by roughly a hundred bytes per interval, and
-deleting it only loses history. Point `XDG_STATE_HOME` elsewhere if you want it
-somewhere else.
+twice, and only its first part counts as a pomodoro for that day). Resetting the
+day's count appends a mark to the same file instead of deleting anything, so the
+count stays a reading of the record. Nothing rotates the file: it grows by
+roughly a hundred bytes per interval, and deleting it only loses history. Point
+`XDG_STATE_HOME` elsewhere if you want it somewhere else.
 
 ## Development
 

@@ -1,8 +1,11 @@
 #!/bin/bash
-# Checks the cue the extension plays at each interval boundary: a headless
-# gnome-shell runs the real code, tools/cue-probe/probe patches the sound player
-# and drives the extension through a pomodoro, a break, a manual start, a pause,
-# a resume and a skip, recording every event id that reaches the player.
+# Checks the cue the extension plays: the only thing that sounds one is a
+# completion, which announces the cue of the interval it advances to, while
+# every start the user makes by hand is silent. A headless gnome-shell runs the
+# real code, tools/cue-probe/probe patches the sound player and drives the
+# extension through two completions (a pomodoro and a break), the hand starts,
+# a pause, a resume and a skip in between, and the sound switch — recording
+# every event id that reaches the player.
 #
 #   ./run.sh                          the working tree
 #   SRC=/path/to/copy ./run.sh        an installed copy — the unpacked upload,
