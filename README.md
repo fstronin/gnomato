@@ -29,6 +29,7 @@ marked `restored` in the journal. See
 | Behaviour | Breaks start themselves, pomodoros do not; a finished interval ends with a banner and announces the next one with its own cue — a rising pair for a pomodoro, a falling one for a break, both made by `tools/sounds/make-sounds.py` — while an interval you start by hand is silent |
 | Journal | Append-only JSONL of finished, skipped and interrupted intervals, and of count resets |
 | Keys | Optional global shortcuts, unassigned by default |
+| Languages | Русский, Español and 简体中文, from `po/` (machine-assisted drafts, native review welcome) |
 
 ## Screenshots
 
@@ -111,6 +112,20 @@ count stays a reading of the record. Nothing rotates the file: it grows by
 roughly a hundred bytes per interval, and deleting it only loses history. Point
 `XDG_STATE_HOME` elsewhere if you want it somewhere else.
 
+## Translations
+
+Русский, Español and 简体中文. The interface strings live in `po/`; `locale/` is
+what the shell actually binds, and it is compiled from `po/` — by
+`tools/i18n/make-messages.py` for a working tree, by `gnome-extensions pack` for
+the bundle and by `debian/rules` for the package (all three need `msgfmt` from
+the gettext package).
+
+The three catalogues are machine-assisted drafts, and say so in their headers: a
+native review is what they are waiting for, and it only has to edit the `msgstr`
+lines. `tools/i18n/make-messages.py --check` keeps every file in step with the
+strings the code uses — a string that appears in the code and in nobody's
+translation is what that check is for.
+
 ## Development
 
 The extension directory *is* the repository root: `metadata.json`,
@@ -122,6 +137,9 @@ glib-compile-schemas schemas/            # after editing the schema
 gjs -m tests/run-tests.js                # unit tests for lib/, no shell needed
 python3 tools/sounds/make-sounds.py      # rewrite the cue sounds from their motifs
 python3 tools/sounds/make-sounds.py --check  # fail when they are not what the motifs render
+python3 tools/i18n/make-messages.py      # compile po/*.po into locale/ (needs gettext)
+python3 tools/i18n/make-messages.py --check   # the template and every po against the code
+python3 tools/i18n/make-messages.py --update  # refresh po/gnomato.pot and merge it into the po files
 ```
 
 Install the working tree for the current user — only the extension itself
@@ -141,7 +159,7 @@ gnome-extensions enable gnomato@fstronin.github.io
 
 What lands there is the extension payload and `LICENSE`: `metadata.json`,
 `extension.js`, `prefs.js`, `stylesheet.css`, `lib/`, `ui/`, `sounds/`,
-`schemas/`, `LICENSE`.
+`locale/`, `schemas/`, `LICENSE`.
 
 Then, in order of how much they change:
 
@@ -161,6 +179,10 @@ Two things to know about this machine specifically:
   (and `--extra-source=sounds`, or the cues ship silent).
   Such a bundle looks complete and fails to import inside the shell. The upload
   we ship is built this way — see `docs/PUBLISHING.md`.
+- `po/` is not copied as it is: `gnome-extensions pack` compiles it into
+  `locale/**/*.mo` itself, which needs `msgfmt` from gettext. `locale/` is a
+  build artifact and is gitignored, so for an rsync install the working tree has
+  to compile it first: `python3 tools/i18n/make-messages.py`.
 - The same uuid in `~/.local/share/gnome-shell/extensions/` and
   `/usr/share/gnome-shell/extensions/` is not an error: the shell logs
   "already installed in user dir … will not be loaded" and runs the user copy,

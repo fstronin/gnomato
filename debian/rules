@@ -1,7 +1,8 @@
 #!/usr/bin/make -f
 # Hand-written rules, no debhelper: the payload is a handful of files plus a
-# private GSettings schema and the two cue sounds, and everything the shell
-# needs is installed as-is.
+# private GSettings schema, the two cue sounds and the compiled translations,
+# and everything the shell needs is installed as-is. Compiling the translations
+# needs msgfmt from the gettext package.
 
 UUID   := gnomato@fstronin.github.io
 STAGE  := $(CURDIR)/debian/gnomato
@@ -19,11 +20,19 @@ binary-indep: binary-arch
 
 binary-arch: build
 	install -d $(EXTDIR)/lib $(EXTDIR)/ui $(EXTDIR)/sounds $(EXTDIR)/schemas $(DOCDIR) $(STAGE)/DEBIAN
+	install -d $(EXTDIR)/locale
 	install -m 0644 metadata.json extension.js prefs.js LICENSE stylesheet.css $(EXTDIR)/
 	install -m 0644 lib/*.js $(EXTDIR)/lib/
 	install -m 0644 ui/*.js $(EXTDIR)/ui/
 	install -m 0644 sounds/*.wav $(EXTDIR)/sounds/
 	install -m 0644 schemas/*.gschema.xml $(EXTDIR)/schemas/
+	# The catalogue of a language is its po file name, and the domain is the
+	# uuid — that is the name metadata.json gives the shell to bind.
+	for po in po/*.po; do \
+	    lang=$${po##*/}; lang=$${lang%.po}; \
+	    install -d $(EXTDIR)/locale/$$lang/LC_MESSAGES; \
+	    msgfmt -c -o $(EXTDIR)/locale/$$lang/LC_MESSAGES/$(UUID).mo $$po; \
+	done
 	glib-compile-schemas --targetdir=$(EXTDIR)/schemas schemas/
 	chmod 0644 $(EXTDIR)/schemas/gschemas.compiled
 	install -m 0644 debian/copyright $(DOCDIR)/copyright

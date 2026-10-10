@@ -1,0 +1,179 @@
+# Gnomato — Chinese (Simplified) translation.
+# Machine-assisted draft (AI), not reviewed by a native speaker yet.
+# Correct it in place: the string set is checked by tools/i18n/make-messages.py --check.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnomato\n"
+"Report-Msgid-Bugs-To: https://github.com/fstronin/gnomato/issues\n"
+"POT-Creation-Date: 2026-10-10 14:38+0200\n"
+"PO-Revision-Date: 2026-10-10 14:38+0200\n"
+"Last-Translator: machine-assisted draft\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: extension.js
+msgid "Break ended while you were away"
+msgstr "你离开期间休息已结束"
+
+#: extension.js
+msgid "Pomodoro finished while you were away"
+msgstr "你离开期间番茄钟已完成"
+
+#: extension.js
+msgid "Ready for the next pomodoro."
+msgstr "可以开始下一个番茄钟了。"
+
+#: extension.js
+msgid "The journal has been updated."
+msgstr "日志已更新。"
+
+#: extension.js
+msgid "Break over"
+msgstr "休息结束"
+
+#: extension.js
+msgid "Pomodoro finished"
+msgstr "番茄钟已完成"
+
+#: extension.js
+msgid "Back to work."
+msgstr "继续工作。"
+
+#: extension.js
+msgid "Time for a break."
+msgstr "该休息一下了。"
+
+#: extension.js
+msgid "Pomodoro timer"
+msgstr "番茄钟计时器"
+
+#: prefs.js
+msgid "Durations"
+msgstr "时长"
+
+#: prefs.js
+msgid "Whole minutes, from 1 to 180."
+msgstr "整数分钟，1 到 180。"
+
+#: prefs.js ui/popup.js
+msgid "Pomodoro"
+msgstr "番茄钟"
+
+#: prefs.js
+msgid "Length of one work interval"
+msgstr "一个工作间隔的时长"
+
+#: prefs.js
+msgid "Short break"
+msgstr "短休息"
+
+#: prefs.js
+msgid "Break after a pomodoro"
+msgstr "番茄钟后的休息"
+
+#: prefs.js
+msgid "Long break"
+msgstr "长休息"
+
+#: prefs.js
+msgid "Break that ends a set"
+msgstr "结束一组的休息"
+
+#: prefs.js
+msgid "Set"
+msgstr "组"
+
+#: prefs.js
+msgid "Pomodoros per set"
+msgstr "每组番茄钟数"
+
+#: prefs.js
+msgid "How many pomodoros come before a long break"
+msgstr "多少个番茄钟后进入长休息"
+
+#: prefs.js
+msgid "Behaviour"
+msgstr "行为"
+
+#: prefs.js
+msgid "Start breaks automatically"
+msgstr "自动开始休息"
+
+#: prefs.js
+msgid "Start pomodoros automatically"
+msgstr "自动开始番茄钟"
+
+#: prefs.js
+msgid "Sound cues when intervals begin and end"
+msgstr "间隔开始与结束时的提示音"
+
+#: prefs.js
+msgid "Keys"
+msgstr "快捷键"
+
+#: prefs.js
+msgid ""
+"Accelerator such as <Control><Alt>p. Leave empty to disable the shortcut."
+msgstr "加速键，例如 <Control><Alt>p。留空即禁用快捷键。"
+
+#: prefs.js
+msgid "Start or pause"
+msgstr "开始或暂停"
+
+#: prefs.js
+msgid "Skip the current interval"
+msgstr "跳过当前间隔"
+
+#: prefs.js
+msgid "Data"
+msgstr "数据"
+
+#: prefs.js
+msgid "Journal"
+msgstr "日志"
+
+#: ui/popup.js
+msgid "Short Break"
+msgstr "短休息"
+
+#: ui/popup.js
+msgid "Long Break"
+msgstr "长休息"
+
+#: ui/popup.js
+msgid "Start"
+msgstr "开始"
+
+#: ui/popup.js
+msgid "Skip"
+msgstr "跳过"
+
+#: ui/popup.js
+msgid "Reset"
+msgstr "回退"
+
+#: ui/popup.js
+msgid "Pause"
+msgstr "暂停"
+
+#: ui/popup.js
+msgid "Resume"
+msgstr "继续"
+
+#: ui/indicator.js
+#, javascript-format
+msgid "Today: %d"
+msgstr "今天：%d"
+
+#: ui/indicator.js
+msgid "Reset count"
+msgstr "重置计数"
+
+#: ui/indicator.js
+msgid "Preferences"
+msgstr "首选项"
+

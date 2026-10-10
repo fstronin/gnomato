@@ -1,0 +1,179 @@
+# Gnomato — Spanish translation.
+# Machine-assisted draft (AI), not reviewed by a native speaker yet.
+# Correct it in place: the string set is checked by tools/i18n/make-messages.py --check.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnomato\n"
+"Report-Msgid-Bugs-To: https://github.com/fstronin/gnomato/issues\n"
+"POT-Creation-Date: 2026-10-10 14:38+0200\n"
+"PO-Revision-Date: 2026-10-10 14:38+0200\n"
+"Last-Translator: machine-assisted draft\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: extension.js
+msgid "Break ended while you were away"
+msgstr "El descanso terminó mientras no estabas"
+
+#: extension.js
+msgid "Pomodoro finished while you were away"
+msgstr "El pomodoro terminó mientras no estabas"
+
+#: extension.js
+msgid "Ready for the next pomodoro."
+msgstr "Listo para el siguiente pomodoro."
+
+#: extension.js
+msgid "The journal has been updated."
+msgstr "El diario se ha actualizado."
+
+#: extension.js
+msgid "Break over"
+msgstr "Descanso terminado"
+
+#: extension.js
+msgid "Pomodoro finished"
+msgstr "Pomodoro terminado"
+
+#: extension.js
+msgid "Back to work."
+msgstr "Vuelve al trabajo."
+
+#: extension.js
+msgid "Time for a break."
+msgstr "Es hora de un descanso."
+
+#: extension.js
+msgid "Pomodoro timer"
+msgstr "Temporizador de pomodoro"
+
+#: prefs.js
+msgid "Durations"
+msgstr "Duraciones"
+
+#: prefs.js
+msgid "Whole minutes, from 1 to 180."
+msgstr "Minutos enteros, de 1 a 180."
+
+#: prefs.js ui/popup.js
+msgid "Pomodoro"
+msgstr "Pomodoro"
+
+#: prefs.js
+msgid "Length of one work interval"
+msgstr "Duración de un intervalo de trabajo"
+
+#: prefs.js
+msgid "Short break"
+msgstr "Descanso corto"
+
+#: prefs.js
+msgid "Break after a pomodoro"
+msgstr "Descanso después de un pomodoro"
+
+#: prefs.js
+msgid "Long break"
+msgstr "Descanso largo"
+
+#: prefs.js
+msgid "Break that ends a set"
+msgstr "Descanso que cierra el conjunto"
+
+#: prefs.js
+msgid "Set"
+msgstr "Conjunto"
+
+#: prefs.js
+msgid "Pomodoros per set"
+msgstr "Pomodoros por conjunto"
+
+#: prefs.js
+msgid "How many pomodoros come before a long break"
+msgstr "Cuántos pomodoros pasan antes de un descanso largo"
+
+#: prefs.js
+msgid "Behaviour"
+msgstr "Comportamiento"
+
+#: prefs.js
+msgid "Start breaks automatically"
+msgstr "Empezar los descansos automáticamente"
+
+#: prefs.js
+msgid "Start pomodoros automatically"
+msgstr "Empezar los pomodoros automáticamente"
+
+#: prefs.js
+msgid "Sound cues when intervals begin and end"
+msgstr "Avisos sonoros al empezar y terminar los intervalos"
+
+#: prefs.js
+msgid "Keys"
+msgstr "Teclas"
+
+#: prefs.js
+msgid ""
+"Accelerator such as <Control><Alt>p. Leave empty to disable the shortcut."
+msgstr "Acelerador como <Control><Alt>p. Déjalo vacío para desactivar el atajo."
+
+#: prefs.js
+msgid "Start or pause"
+msgstr "Empezar o pausar"
+
+#: prefs.js
+msgid "Skip the current interval"
+msgstr "Saltar el intervalo actual"
+
+#: prefs.js
+msgid "Data"
+msgstr "Datos"
+
+#: prefs.js
+msgid "Journal"
+msgstr "Diario"
+
+#: ui/popup.js
+msgid "Short Break"
+msgstr "Descanso corto"
+
+#: ui/popup.js
+msgid "Long Break"
+msgstr "Descanso largo"
+
+#: ui/popup.js
+msgid "Start"
+msgstr "Empezar"
+
+#: ui/popup.js
+msgid "Skip"
+msgstr "Saltar"
+
+#: ui/popup.js
+msgid "Reset"
+msgstr "Rebobinar"
+
+#: ui/popup.js
+msgid "Pause"
+msgstr "Pausa"
+
+#: ui/popup.js
+msgid "Resume"
+msgstr "Continuar"
+
+#: ui/indicator.js
+#, javascript-format
+msgid "Today: %d"
+msgstr "Hoy: %d"
+
+#: ui/indicator.js
+msgid "Reset count"
+msgstr "Reiniciar el recuento"
+
+#: ui/indicator.js
+msgid "Preferences"
+msgstr "Preferencias"
+

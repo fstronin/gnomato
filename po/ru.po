@@ -1,0 +1,179 @@
+# Gnomato — Russian translation.
+# Machine-assisted draft (AI), not reviewed by a native speaker yet.
+# Correct it in place: the string set is checked by tools/i18n/make-messages.py --check.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnomato\n"
+"Report-Msgid-Bugs-To: https://github.com/fstronin/gnomato/issues\n"
+"POT-Creation-Date: 2026-10-10 14:38+0200\n"
+"PO-Revision-Date: 2026-10-10 14:38+0200\n"
+"Last-Translator: machine-assisted draft\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: extension.js
+msgid "Break ended while you were away"
+msgstr "Перерыв закончился, пока тебя не было"
+
+#: extension.js
+msgid "Pomodoro finished while you were away"
+msgstr "Помидор завершился, пока тебя не было"
+
+#: extension.js
+msgid "Ready for the next pomodoro."
+msgstr "Готов к следующему помидору."
+
+#: extension.js
+msgid "The journal has been updated."
+msgstr "Журнал обновлён."
+
+#: extension.js
+msgid "Break over"
+msgstr "Перерыв окончен"
+
+#: extension.js
+msgid "Pomodoro finished"
+msgstr "Помидор завершён"
+
+#: extension.js
+msgid "Back to work."
+msgstr "Возвращайся к работе."
+
+#: extension.js
+msgid "Time for a break."
+msgstr "Пора на перерыв."
+
+#: extension.js
+msgid "Pomodoro timer"
+msgstr "Таймер помидора"
+
+#: prefs.js
+msgid "Durations"
+msgstr "Длительности"
+
+#: prefs.js
+msgid "Whole minutes, from 1 to 180."
+msgstr "Целые минуты, от 1 до 180."
+
+#: prefs.js ui/popup.js
+msgid "Pomodoro"
+msgstr "Помидор"
+
+#: prefs.js
+msgid "Length of one work interval"
+msgstr "Длительность одного интервала работы"
+
+#: prefs.js
+msgid "Short break"
+msgstr "Короткий перерыв"
+
+#: prefs.js
+msgid "Break after a pomodoro"
+msgstr "Перерыв после помидора"
+
+#: prefs.js
+msgid "Long break"
+msgstr "Длинный перерыв"
+
+#: prefs.js
+msgid "Break that ends a set"
+msgstr "Перерыв, завершающий набор"
+
+#: prefs.js
+msgid "Set"
+msgstr "Набор"
+
+#: prefs.js
+msgid "Pomodoros per set"
+msgstr "Помидоров в наборе"
+
+#: prefs.js
+msgid "How many pomodoros come before a long break"
+msgstr "Сколько помидоров проходит до длинного перерыва"
+
+#: prefs.js
+msgid "Behaviour"
+msgstr "Поведение"
+
+#: prefs.js
+msgid "Start breaks automatically"
+msgstr "Автоматически начинать перерывы"
+
+#: prefs.js
+msgid "Start pomodoros automatically"
+msgstr "Автоматически начинать помидоры"
+
+#: prefs.js
+msgid "Sound cues when intervals begin and end"
+msgstr "Звуковые сигналы в начале и конце интервалов"
+
+#: prefs.js
+msgid "Keys"
+msgstr "Клавиши"
+
+#: prefs.js
+msgid ""
+"Accelerator such as <Control><Alt>p. Leave empty to disable the shortcut."
+msgstr "Акселератор вида <Control><Alt>p. Пусто — сочетание выключено."
+
+#: prefs.js
+msgid "Start or pause"
+msgstr "Старт или пауза"
+
+#: prefs.js
+msgid "Skip the current interval"
+msgstr "Пропустить текущий интервал"
+
+#: prefs.js
+msgid "Data"
+msgstr "Данные"
+
+#: prefs.js
+msgid "Journal"
+msgstr "Журнал"
+
+#: ui/popup.js
+msgid "Short Break"
+msgstr "Короткий перерыв"
+
+#: ui/popup.js
+msgid "Long Break"
+msgstr "Длинный перерыв"
+
+#: ui/popup.js
+msgid "Start"
+msgstr "Старт"
+
+#: ui/popup.js
+msgid "Skip"
+msgstr "Пропустить"
+
+#: ui/popup.js
+msgid "Reset"
+msgstr "Сброс"
+
+#: ui/popup.js
+msgid "Pause"
+msgstr "Пауза"
+
+#: ui/popup.js
+msgid "Resume"
+msgstr "Продолжить"
+
+#: ui/indicator.js
+#, javascript-format
+msgid "Today: %d"
+msgstr "Сегодня: %d"
+
+#: ui/indicator.js
+msgid "Reset count"
+msgstr "Сбросить счёт"
+
+#: ui/indicator.js
+msgid "Preferences"
+msgstr "Настройки"
+

@@ -3,3 +3,6 @@
 .superpowers/
 
 .scratch/
+
+# Built from po/ by tools/i18n/make-messages.py (and by pack and the package).
+locale/

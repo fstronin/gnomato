@@ -1,0 +1,179 @@
+# Translation template for Gnomato.
+# Copyright (C) 2026 Yegor Chuperka
+# This file is distributed under the same license as the gnomato package.
+# Yegor Chuperka <yegor-chuperka@yandex.ru>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnomato\n"
+"Report-Msgid-Bugs-To: https://github.com/fstronin/gnomato/issues\n"
+"POT-Creation-Date: 2026-10-10 14:38+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: extension.js
+msgid "Break ended while you were away"
+msgstr ""
+
+#: extension.js
+msgid "Pomodoro finished while you were away"
+msgstr ""
+
+#: extension.js
+msgid "Ready for the next pomodoro."
+msgstr ""
+
+#: extension.js
+msgid "The journal has been updated."
+msgstr ""
+
+#: extension.js
+msgid "Break over"
+msgstr ""
+
+#: extension.js
+msgid "Pomodoro finished"
+msgstr ""
+
+#: extension.js
+msgid "Back to work."
+msgstr ""
+
+#: extension.js
+msgid "Time for a break."
+msgstr ""
+
+#: extension.js
+msgid "Pomodoro timer"
+msgstr ""
+
+#: prefs.js
+msgid "Durations"
+msgstr ""
+
+#: prefs.js
+msgid "Whole minutes, from 1 to 180."
+msgstr ""
+
+#: prefs.js ui/popup.js
+msgid "Pomodoro"
+msgstr ""
+
+#: prefs.js
+msgid "Length of one work interval"
+msgstr ""
+
+#: prefs.js
+msgid "Short break"
+msgstr ""
+
+#: prefs.js
+msgid "Break after a pomodoro"
+msgstr ""
+
+#: prefs.js
+msgid "Long break"
+msgstr ""
+
+#: prefs.js
+msgid "Break that ends a set"
+msgstr ""
+
+#: prefs.js
+msgid "Set"
+msgstr ""
+
+#: prefs.js
+msgid "Pomodoros per set"
+msgstr ""
+
+#: prefs.js
+msgid "How many pomodoros come before a long break"
+msgstr ""
+
+#: prefs.js
+msgid "Behaviour"
+msgstr ""
+
+#: prefs.js
+msgid "Start breaks automatically"
+msgstr ""
+
+#: prefs.js
+msgid "Start pomodoros automatically"
+msgstr ""
+
+#: prefs.js
+msgid "Sound cues when intervals begin and end"
+msgstr ""
+
+#: prefs.js
+msgid "Keys"
+msgstr ""
+
+#: prefs.js
+msgid ""
+"Accelerator such as <Control><Alt>p. Leave empty to disable the shortcut."
+msgstr ""
+
+#: prefs.js
+msgid "Start or pause"
+msgstr ""
+
+#: prefs.js
+msgid "Skip the current interval"
+msgstr ""
+
+#: prefs.js
+msgid "Data"
+msgstr ""
+
+#: prefs.js
+msgid "Journal"
+msgstr ""
+
+#: ui/popup.js
+msgid "Short Break"
+msgstr ""
+
+#: ui/popup.js
+msgid "Long Break"
+msgstr ""
+
+#: ui/popup.js
+msgid "Start"
+msgstr ""
+
+#: ui/popup.js
+msgid "Skip"
+msgstr ""
+
+#: ui/popup.js
+msgid "Reset"
+msgstr ""
+
+#: ui/popup.js
+msgid "Pause"
+msgstr ""
+
+#: ui/popup.js
+msgid "Resume"
+msgstr ""
+
+#: ui/indicator.js
+#, javascript-format
+msgid "Today: %d"
+msgstr ""
+
+#: ui/indicator.js
+msgid "Reset count"
+msgstr ""
+
+#: ui/indicator.js
+msgid "Preferences"
+msgstr ""

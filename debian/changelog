@@ -22,6 +22,11 @@ gnomato (0.4.0) unstable; urgency=medium
     system's event-sound switch is now read by the extension itself, since
     Mutter applies it to theme sounds alone.
 
+  * Translations: Русский, Español and 简体中文, as po/ catalogues compiled into
+    locale/ (by the pack, the package and tools/i18n/make-messages.py alike).
+    They are machine-assisted drafts and say so in their headers; the check that
+    keeps them in step with the code runs in the release ritual.
+
  -- Yegor Chuperka <yegor-chuperka@yandex.ru>  Sat, 10 Oct 2026 13:55:52 +0200
 
 gnomato (0.3.0) unstable; urgency=medium

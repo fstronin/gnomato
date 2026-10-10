@@ -16,6 +16,10 @@ stays a local convenience for machines we control.
 - The GSettings schema id is `org.gnome.shell.extensions.gnomato` and has
   nothing to do with the uuid: a rename does **not** lose settings or the
   journal, only the extension directory name and the `enabled-extensions` entry.
+- The gettext domain of the translations *is* the uuid, so it does depend on it:
+  the catalogue files (`locale/**/gnomato@fstronin.github.io.mo`) and the
+  directory name are rebuilt by pack from the current metadata, but anything
+  already translated elsewhere keeps the old name.
 - `metadata.json` carries no `version` — that field belongs to the site, which
   assigns and overrides it. The version users see comes from `version-name`: a
   string of 1–16 characters, letters, digits, space and period only.
@@ -34,8 +38,10 @@ gnome-extensions pack --force --out-dir dist \
 `prefs.js`, `stylesheet.css`, `schemas/` and `locale/`. Everything the extension
 imports or plays has to be named: without `--extra-source=lib --extra-source=ui`
 the zip is missing both directories and the extension fails at import time, and
-without `--extra-source=sounds` it ships silent cues. This is the one build step
-that silently produces a broken upload.
+without `--extra-source=sounds` it ships silent cues. Translations need no flag:
+a `po/` directory is compiled into `locale/<language>/LC_MESSAGES/<domain>.mo`
+by pack itself — which needs `msgfmt` from the gettext package. This is the one
+build step that silently produces a broken upload.
 
 The result is `dist/<uuid>.shell-extension.zip`. `dist/` and `*.zip` are
 gitignored — the bundle is an artifact, not a source file.
@@ -47,6 +53,8 @@ What belongs inside:
   Do not ship the compiled file.
 - `sounds/*.wav` — the two cue sounds the extension plays; without them the
   cues are silent, and nothing reports it.
+- `locale/<language>/LC_MESSAGES/<domain>.mo` — the translations, compiled from
+  `po/` by pack; the pot is a template for translators and does not belong here.
 - `LICENSE`.
 
 What stays out: `docs/images/` (the icon and screenshots are uploaded on the
@@ -107,6 +115,7 @@ One commit per release, four files in step:
    source of the package version).
 2. `metadata.json` — `version-name` matches that version.
 3. `docs/images/` — regenerate with `tools/screenshots/run.sh` if the UI changed.
-4. `tools/cue-probe/run.sh`, `gjs -m tests/run-tests.js` and
+4. `tools/cue-probe/run.sh`, `gjs -m tests/run-tests.js`,
+   `python3 tools/i18n/make-messages.py --check` and
    `python3 tools/sounds/make-sounds.py --check` green, then pack, verify the
    bundle, upload, tag.
